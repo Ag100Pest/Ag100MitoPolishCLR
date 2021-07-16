@@ -134,11 +134,12 @@ if ! [[ -e "${W_URL}/trimmed" ]]; then
 
 fi
 
-if ! [[ -e "${W_URL}/trimmed/${FNAME}.delta" ]]; then
+# Commenting this out because I want it to run anyway
+#if ! [[ -e "${W_URL}/trimmed/${FNAME}.delta" ]]; then
 
 	nucmer --maxmatch --nosimplify ${W_URL}/trimmed/intermediate.fasta ${W_URL}/trimmed/intermediate.fasta -f -p "${W_URL}/trimmed/${FNAME}" -b ${SEN}
 
-fi
+#fi
 
 NUCMER_OUT=$(show-coords ${W_URL}/trimmed/${FNAME}.delta -lrcTHo | grep "BEGIN" | awk 'NR==1 {print}')
 
@@ -162,14 +163,25 @@ if ! [[ -z ${NUCMER_OUT} ]]; then
 	CONTIG_NEW=${W_URL}/trimmed/intermediate.fasta
 
 	if (( ${BEGIN2} > ${END1} )); then
+	printf "BEGIN2 > END1 \n"
 
 		echo ">${FNAME}" > "${W_URL}/trimmed/${FNAME}_new.fasta" & grep -v ">" ${W_URL}/trimmed/intermediate.fasta | tr -d '\n' | cut -c${BEGIN1}-${BEGIN2} >> "${W_URL}/trimmed/${FNAME}_new.fasta"
+
+		echo "trimmed once"
+		ls "${W_URL}/trimmed/${FNAME}_new.fasta"		
+		echo "running nucmer again"
 
 		nucmer --maxmatch --nosimplify "${W_URL}/trimmed/${FNAME}_new.fasta" "${W_URL}/trimmed/${FNAME}_new.fasta" -f -p "${W_URL}/trimmed/${FNAME}" -b ${SEN}
 
 		CONTIG_NEW="${W_URL}/trimmed/${FNAME}_new.fasta"
 
+		echo "ran nucmer again"
+
+		show-coords "${W_URL}/trimmed/${FNAME}.delta" -lrcTHo
+	
 		NUCMER_OUT=$(show-coords "${W_URL}/trimmed/${FNAME}.delta" -lrcTHo | grep "BEGIN" | head -1)
+		
+
 		BEGIN1=$(echo $NUCMER_OUT | awk '{print $1}')
 		BEGIN2=$(echo $NUCMER_OUT | awk '{print $2}')
 		END1=$(echo $NUCMER_OUT | awk '{print $3}')
@@ -187,6 +199,8 @@ if ! [[ -z ${NUCMER_OUT} ]]; then
 	fi
 
 	if (( ${BEGIN2} > ${END1} )); then
+
+	printf "BEGIN2 > END1  still"
 
 		echo ">${FNAME}" > "${W_URL}/trimmed/${FNAME}_new2.fasta" & grep -v ">" ${W_URL}/trimmed/${FNAME}_new.fasta | tr -d '\n' | cut -c${BEGIN1}-${BEGIN2} >> "${W_URL}/trimmed/${FNAME}_new2.fasta"
 
@@ -211,6 +225,8 @@ if ! [[ -z ${NUCMER_OUT} ]]; then
 		printf "END1: ${END1}\n"
 	
 	fi
+
+printf "trimming done \n"
 
 	END2=$(echo $NUCMER_OUT | awk '{print $4}')
 	MIDDLE="$(( ${BEGIN2} + 1 ))-$(( ${END1} - 1 ))"

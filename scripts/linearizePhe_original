@@ -102,10 +102,7 @@ printf "\n--Annotating tRNAs:\n\n"
 
 if ! [[ -e "${W_URL}/linearizeGln/tRNAscan-SE.out" ]]; then
 
-#VGP parameters:
-#	tRNAscan-SE ${W_URL}/trimmed2/${FNAME}_trim2.fasta -M vert -q > ${W_URL}/linearizeGln/tRNAscan-SE.out
-#Modified parameters:
-	tRNAscan-SE ${W_URL}/trimmed2/${FNAME}_trim2.fasta -O -X 1 -g ~/.conda/envs/mitoVGP_pacbio/lib/tRNAscan-SE/gcode/gcode.invmito -q > ${W_URL}/linearizeGln/tRNAscan-SE.out
+	tRNAscan-SE ${W_URL}/trimmed2/${FNAME}_trim2.fasta -M vert -q > ${W_URL}/linearizeGln/tRNAscan-SE.out
 
 fi
 
@@ -129,9 +126,7 @@ if (( ${GLN_START} > ${GLN_END} )); then
 
 	printf "$(sed -n 1p ${W_URL}/trimmed2/${FNAME}_trim2.fasta)\n$(grep -v ">" ${W_URL}/trimmed2/${FNAME}_trim2.fasta | tr -d "\n " | tr "[ATGCUatgcuNnYyRrSsWwKkMmBbDdHhVv]" "[TACGAtacgaNnRrYySsWwMmKkVvHhDdBb]" | rev)" > ${W_URL}/linearizeGln/${FNAME}_trim2_rv.fasta
 
-#	tRNAscan-SE ${W_URL}/linearizeGln/${FNAME}_trim2_rv.fasta -M vert -q > ${W_URL}/linearizeGln/tRNAscan-SE_rv.out
-#Modified parameters:
-	tRNAscan-SE ${W_URL}/linearizeGln/${FNAME}_trim2_rv.fasta -O -X 1 -g ~/.conda/envs/mitoVGP_pacbio/lib/tRNAscan-SE/gcode/gcode.invmito -q > ${W_URL}/linearizeGln/tRNAscan-SE_rv.out
+	tRNAscan-SE ${W_URL}/linearizeGln/${FNAME}_trim2_rv.fasta -M vert -q > ${W_URL}/linearizeGln/tRNAscan-SE_rv.out
 	
 	GLN_START=$(grep "Phe" ${W_URL}/linearizeGln/tRNAscan-SE_rv.out | awk '{print $3}')
 	GLN_END=$(grep "Phe" ${W_URL}/linearizeGln/tRNAscan-SE_rv.out | awk '{print $4}')

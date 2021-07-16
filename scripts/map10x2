@@ -106,9 +106,9 @@ fi
 
 printf "\n--Generate sorted alignment:\n"
 
-if ! [[ -e "${W_URL}/bowtie2_round2" ]]; then
+if ! [[ -e "${W_URL}/bowtie2_round2/aligned_${ID}_all_trimmed_sorted.bam" ]]; then
 
-	mkdir ${W_URL}/bowtie2_round2
+	mkdir -p ${W_URL}/bowtie2_round2
 
 	printf "\nAlign...\n"
 
@@ -133,6 +133,7 @@ fi
 
 printf "\n--Variant calling and polishing:\n"
 
+### may be better to check for the output, not just the directory
 if ! [[ -e "${W_URL}/freebayes_round2/" ]]; then
 
 	mkdir ${W_URL}/freebayes_round2/
