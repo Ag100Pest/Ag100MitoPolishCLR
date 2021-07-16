@@ -1,4 +1,4 @@
-# Ag100pest CLR+ILLUMINA  mt genome pipeline
+# Ag100pest CLR+Illumina  mt genome pipeline
 Developing this pipeline with data from the pink cotton bollworm (*Pectinophora gossypiella*), which is also being used to develop the full CLR polishing pipleline (https://github.com/isugifNF/polishCLR).  
 
 This approach modifies the mitoVGP pipeline to assemble, polish, circularize, and annotate Ag100Pest mt genomes frm CLR + Illumina data.
@@ -56,16 +56,3 @@ We use the mitoVGP approach to assemble, polish, and do preliminary trimming. Su
  ## Report summary
  What all do we want here?
 
-
-## TOC
-* 00_Files.md
-  * lists raw data
-* 00a_Metadata.md
-* 01_Background.md
-* 02_Methods.md  
-* 03_Results.md
-* 04_Introduction.md
-* 05_Discussion.md
-* 06_AuthorInfo.md
-* Notes.md
-  * the bulk of where I'm documenting process, thoughs etc for now
