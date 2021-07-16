@@ -1,4 +1,4 @@
-# Ag100pest mt genome pipeline
+# Ag100pest CLR+ILLUMINA  mt genome pipeline
 Developing this pipeline with data from the pink cotton bollworm (*Pectinophora gossypiella*), which is also being used to develop the full CLR polishing pipleline (https://github.com/isugifNF/polishCLR).  
 
 This approach modifies the mitoVGP pipeline to assemble, polish, circularize, and annotate Ag100Pest mt genomes frm CLR + Illumina data.
@@ -11,6 +11,8 @@ This has only been tested on Scinet Ceres.
 https://github.com/gf777/mitoVGP
 
 Formenti, G., Rhie, A., Balacco, J. et al. Complete vertebrate mitogenomes reveal widespread repeats and gene duplications. Genome Biol 22, 120 (2021). https://doi.org/10.1186/s13059-021-02336-9
+
+`conda env create -f mitoVGP_conda_env_pacbio.yml --prefix /project/ag100pest/software/modified_mitoVGP/pacbio_mitoVGP`
 
 **mitofinder**
 
