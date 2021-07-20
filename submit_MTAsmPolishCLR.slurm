@@ -16,6 +16,6 @@ mitoVGP=/project/ag100pest/software/modified_mitoVGP/
 #=== Main program
 cd /project/ag100pest/Pgos/RawData/MT_Contig/mitoVGP # hardcoded for Pgos
 source activate $mitoVGP/pacbio_mitoVGP
-./run_mitoVGP.sh # hardcoded for Pgos
+$mitoVGP/run_mitoVGP.sh # hardcoded for Pgos
 
 
