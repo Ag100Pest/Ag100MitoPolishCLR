@@ -10,11 +10,16 @@
 
 #=== Load any modules
 export PATH=$PATH:/project/ag100pest/software/modified_mitoVGP/
-mitoVGP=/project/ag100pest/software/modified_mitoVGP/
+mitoVGP=/project/ag100pest/software/modified_mitoVGP
 
 #=== Main program
-cd /project/ag100pest/Pgos/RawData/MT_Contig/mitoVGP # hardcoded for Pgos
+# printf "running on species $1 with jobid $2"
+SPECIES="Pgos" # hardcoded for now
+JOB="Pgos"
+
+mkdir -p /project/ag100pest/$SPECIES/RawData/MT_Contig/mitoVGP
+cd /project/ag100pest/$SPECIES/RawData/MT_Contig/mitoVGP
 source activate $mitoVGP/pacbio_mitoVGP
-$mitoVGP/run_mitoVGP.sh # hardcoded for Pgos
+$mitoVGP/run_mitoVGP.sh $SPECIES $JOBID  # hardcoded for Pgos
 
 

@@ -397,8 +397,8 @@ if ! [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
 		CANU="${CANU} ${OPTS//_/ }"
 
 	fi
-	
-	CANU="${CANU} -p ${ID} -d ${W_URL}/canu useGrid=false"
+# adding parameters corOutCoverage=500 contigFilter="2 0 1.0 0.5 0" and 'readSamplingCoverage=100' to reduce filtering 	
+	CANU="${CANU} -p ${ID} -d ${W_URL}/canu useGrid=false corOutCoverage=500 contigFilter="2 0 1.0 0.5 0" readSamplingCoverage=100"
 	CANU="${CANU} genomeSize=${GSIZE}"
 #	CANU="${CANU} -gridEngineResourceOption=\"-R\\\"select[mem>${LSF_MEM}] rusage[mem=${LSF_MEM}]\\\" -M${LSF_MEM} -n ${NPROC}\""
 

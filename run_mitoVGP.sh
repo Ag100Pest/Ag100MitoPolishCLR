@@ -18,6 +18,10 @@ exit 0
 fi
 
 mitoVGP=/project/ag100pest/software/modified_mitoVGP
+SPECIES=$1
+J=$2
+echo $SPECIES
+echo $J
 
 module load canu/1.8 #default is 2.1.1
 
