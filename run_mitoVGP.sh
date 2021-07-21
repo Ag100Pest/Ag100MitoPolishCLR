@@ -23,7 +23,7 @@ J=$2
 echo $SPECIES
 echo $J
 
-module load canu/1.8 #default is 2.1.1
+module load canu/2.1 #default is 2.1.1
 
 $mitoVGP/mitoVGP -a pacbio \
 	-s $SPECIES -i $J -r NC_041123.1.fasta \
