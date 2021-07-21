@@ -193,12 +193,13 @@ if [[  ${ALN} == "pbmm2" ]] && ! [[ -e ${W_URL}/reference/${REF%.*}.fasta.mmi ]]
 
 fi
 
+## Can probably take all of this out
 #if vgp mode download
-if [[ -z ${READ1} ]] && [[ ${DOWNL} == true ]] && ! [[ "$(ls -A ${W_URL}/tgs_bam)" ]] ; then
+#if [[ -z ${READ1} ]] && [[ ${DOWNL} == true ]] && ! [[ "$(ls -A ${W_URL}/tgs_bam)" ]] ; then
 
-	aws s3 --no-sign-request cp --recursive --exclude="*scrap*" --exclude="*xml*" --exclude="*bai*" --exclude="*pbi*" --include="*.subreads.bam" s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/ ${W_URL}/
+#	aws s3 --no-sign-request cp --recursive --exclude="*scrap*" --exclude="*xml*" --exclude="*bai*" --exclude="*pbi*" --include="*.subreads.bam" s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/ ${W_URL}/
 
-fi
+#fi
 
 printf "\n--Following long read files found:\n"
 
@@ -217,13 +218,13 @@ if ! [[ -e "${W_URL}/tgs_bam/aligned_$(basename -- "${p%.*}").bam" ]] && ! [[ $p
 	
 	if [[ -z ${READ1} ]]; then
 
-		if [[ -z ${DOWNL} ]] || ! [[  ${DOWNL} == true ]]; then
+		#if [[ -z ${DOWNL} ]] || ! [[  ${DOWNL} == true ]]; then
 
-			#if vgp mode download
-			aws s3 --no-sign-request cp s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/$p ${W_URL}/
+			## if vgp mode download
+			## aws s3 --no-sign-request cp s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/$p ${W_URL}/
 			#align
 			
-		fi
+		#fi
 
 	else
 		
@@ -397,8 +398,11 @@ if ! [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
 		CANU="${CANU} ${OPTS//_/ }"
 
 	fi
-# adding parameters corOutCoverage=500 to retain mitochondrial contigs  	
-	CANU="${CANU} -p ${ID} -d ${W_URL}/canu corOutCoverage=5000"
+# adding version print statement
+	$CANU --version  
+	CANU="${CANU} -p ${ID} -d ${W_URL}/canu"
+# adding parameters corOutCoverage=5000 to retain mitochondrial contigs in canu/2.1
+	CANU="${CANU} corOutCoverage=5000"
 	CANU="${CANU} genomeSize=${GSIZE}"
 	CANU="${CANU} -gridEngineResourceOption=\"-R\\\"select[mem>${LSF_MEM}] rusage[mem=${LSF_MEM}]\\\" -M${LSF_MEM} -n ${NPROC}\""
 

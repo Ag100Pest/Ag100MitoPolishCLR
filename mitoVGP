@@ -287,9 +287,10 @@ sh -e $mitoVGPdir/scripts/map10x2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NP
 printf "\nCommand: sh -e $mitoVGPdir/scripts/trimmer2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out\n"
 sh -e $mitoVGPdir/scripts/trimmer2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out &&
 
+## Annotate in mitofinder
 #allow the final sequence to start with Phenylalanine
-printf "\nCommand: sh -e $mitoVGPdir/scripts/linearizePhe -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/linearizePhe -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_linearizePhe_$(date "+%Y%m%d-%H%M%S").out &&
+#printf "\nCommand: sh -e $mitoVGPdir/scripts/linearizePhe -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out\n"
+#sh -e $mitoVGPdir/scripts/linearizePhe -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_linearizePhe_$(date "+%Y%m%d-%H%M%S").out &&
 
 printf "\n\nDone!" &&
 printf "\n\nCompleted at: $(date "+%Y-%m-%d %H-%M-%S")\n\n"
