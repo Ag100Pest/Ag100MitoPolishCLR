@@ -27,7 +27,10 @@ Allio, R., Schomaker-Bastos, A., Romiguier, J., Prosdocimi, F., Nabholz, B., & D
   * `<reference>.gb`: Mitochnodrial genbank of a closely related species. In this case, Sitotroga cerealella mitochondrion, complete genome
 
 ### Reference mt genomes
-Reads are 
+Reads are assembled if they align against the reference mitogenome, so best to have a complete assembly.  
+Find closely related mitogenomes at https://goat.genomehubs.org/ 
+Pull fasta or gb with EDirect suite from NCBI
+`esearch -db nucleotide -query “<Accession #>” | efetch -format fasta >out.fasta`
 
 ## Assembly
 
