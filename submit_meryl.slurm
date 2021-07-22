@@ -5,4 +5,6 @@ module load meryl/1.0
 
 MERQ=/project/ag100pest/software/merqury
 
-sbatch $MERQ/_submit_build.sh 31 ../mitoVGP/I_list.txt Pgos_k31
+printf "out meryl db in ${$1}.meryl" # supplied by toplevel mitovgp script
+
+sbatch $MERQ/_submit_build.sh 31 $2 $1
