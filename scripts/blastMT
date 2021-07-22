@@ -118,9 +118,11 @@ grep ">" ${W_URL}/canu/${ID}.contigs.fasta > ${W_URL}/blast/${ID%.*.*}_contig_na
 
 grep -oe ">tig[0-9]*" ${W_URL}/blast/${ID%.*.*}_contig_names.ls | tr -d '>' > ${W_URL}/blast/${ID%.*.*}_tig_IDs.ls
 
-grep -oe "suggestCircular=.*" ${W_URL}/blast/${ID%.*.*}_contig_names.ls | grep -o "[^suggestCircular=].*" > ${W_URL}/blast/${ID%.*.*}_tig_circularity.ls
+grep -oe "suggestCircular=.\S*" ${W_URL}/blast/${ID%.*.*}_contig_names.ls | grep -o "[^suggestCircular=].*" > ${W_URL}/blast/${ID%.*.*}_tig_circularity.ls
 
-grep -oe "reads=[0-9]*" ${W_URL}/blast/${ID%.*.*}_contig_names.ls | grep -o "[^reads=].*" > ${W_URL}/blast/${ID%.*.*}_tig_nreads.ls
+grep -oe "reads=[0-9]\S*" ${W_URL}/blast/${ID%.*.*}_contig_names.ls | grep -o "[^reads=].*" > ${W_URL}/blast/${ID%.*.*}_tig_nreads.ls
+
+grep -oe "trim=.\S*" ${W_URL}/blast/${ID%.*.*}_contig_names.ls | grep -o "[^trim=].*" > ${W_URL}/blast/${ID%.*.*}_tig_trim.ls
 
 paste -d '\t,' ${W_URL}/blast/${ID%.*.*}_tig_IDs.ls ${W_URL}/blast/${ID%.*.*}_tig_circularity.ls ${W_URL}/blast/${ID%.*.*}_tig_nreads.ls > ${W_URL}/blast/${ID%.*.*}_tig_IDs_circularity_nreads.ls
 

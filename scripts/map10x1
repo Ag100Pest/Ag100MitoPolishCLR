@@ -133,12 +133,12 @@ fi
 
 
 
-if ! [[ -e "${W_URL}/bowtie2_round1/log/short_reads_file_list_$dw_date.txt" ]] && [[ -z ${IL} ]]; then
+if [[ -z ${IL} ]]; then
+	printf "Missing short-read list"	
+#	printf "Collecting data using: aws s3 --no-sign-request ls s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/\n\n"
+#	aws s3 --no-sign-request ls s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/ > ${W_URL}/bowtie2_round1/log/short_reads_file_list_aws_$dw_date.txt
 	
-	printf "Collecting data using: aws s3 --no-sign-request ls s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/\n\n"
-	aws s3 --no-sign-request ls s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/ > ${W_URL}/bowtie2_round1/log/short_reads_file_list_aws_$dw_date.txt
-	
-	awk '{print $4}' ${W_URL}/bowtie2_round1/log/short_reads_file_list_aws_$dw_date.txt > ${W_URL}/bowtie2_round1/log/short_reads_file_list_$dw_date.txt
+#	awk '{print $4}' ${W_URL}/bowtie2_round1/log/short_reads_file_list_aws_$dw_date.txt > ${W_URL}/bowtie2_round1/log/short_reads_file_list_$dw_date.txt
 	
 else
 
@@ -185,11 +185,11 @@ if ! [[ -e "${W_URL}/bowtie2_round1/aligned_raw_reads" ]]; then
 
 fi
 
-if [[ ${DOWNL} == true ]] && ! [[ "$(ls -A ${W_URL}/bowtie2_round1/aligned_raw_reads)" ]] ; then
+#if [[ ${DOWNL} == true ]] && ! [[ "$(ls -A ${W_URL}/bowtie2_round1/aligned_raw_reads)" ]] ; then
 
-	aws s3 --no-sign-request cp --recursive --include="*.fastq.gz" --exclude="*I1*" s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/ ${W_URL}
+#	aws s3 --no-sign-request cp --recursive --include="*.fastq.gz" --exclude="*I1*" s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/ ${W_URL}
 
-fi
+#fi
 
 #for each 10x PE raw data do
 for ((i=0; i<${#p1[*]}; i++));
@@ -204,20 +204,20 @@ do
 
 	if [[ -z ${IL} ]]; then
 
-		if [[ -z ${DOWNL} ]] || ! [[  ${DOWNL} == true ]]; then
-			#download
-			aws --no-sign-request s3 cp s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/${p1[i]} ${W_URL}
-			aws --no-sign-request s3 cp s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/${p2[i]} ${W_URL}
-		fi
+#		if [[ -z ${DOWNL} ]] || ! [[  ${DOWNL} == true ]]; then
+#			#download
+#			aws --no-sign-request s3 cp s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/${p1[i]} ${W_URL}
+#			aws --no-sign-request s3 cp s3://genomeark/species/${SPECIES}/${ID}/genomic_data/10x/${p2[i]} ${W_URL}
+#		fi
 
 	p1=${p1[i]}
 	p2=${p2[i]}
 
 	else
 	
-	ln -s ${p1[i]} ${W_URL}/$(basename -- "${p1[i]}")
+	ln -sf ${p1[i]} ${W_URL}/$(basename -- "${p1[i]}")
 	p1=$(basename -- "${p1[i]}")
-	ln -s ${p2[i]} ${W_URL}/$(basename -- "${p2[i]}")
+	ln -sf ${p2[i]} ${W_URL}/$(basename -- "${p2[i]}")
 	p2=$(basename -- "${p2[i]}")
 	
 	fi

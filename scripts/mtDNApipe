@@ -158,7 +158,7 @@ fi
 dw_date=`date "+%Y%m%d-%H%M%S"`;
 
 
-if ! [[ -z ${READ1} ]]; then
+if  [[ -z ${READ1} ]]; then
 	
 printf "Missing long read file. Supply list of long reads as -1 <PB_list.txt>"
     #record Pacbio raw data files available in the cloud at the time of the analysis
@@ -217,7 +217,7 @@ while read p; do
 if ! [[ -e "${W_URL}/tgs_bam/aligned_$(basename -- "${p%.*}").bam" ]] && ! [[ $p == *scraps* ]] && ! [[ $p == *.pbi ]] && ([[ $p == *.bam ]] || [[ $p == *.fastq ]] || [[ $p == *.fasta ]] || [[ $p == *.fa ]] || [[ $p == *.fq ]]); then
 	
 	if [[ -z ${READ1} ]]; then
-
+		printf "missing READ1"
 		#if [[ -z ${DOWNL} ]] || ! [[  ${DOWNL} == true ]]; then
 
 			## if vgp mode download
@@ -228,7 +228,7 @@ if ! [[ -e "${W_URL}/tgs_bam/aligned_$(basename -- "${p%.*}").bam" ]] && ! [[ $p
 
 	else
 		
-		ln -s $p ${W_URL}/$(basename -- "$p")
+		ln -sf $p ${W_URL}/$(basename -- "$p")
 		p=$(basename -- "$p")
 	fi
 	
@@ -389,7 +389,7 @@ if ! [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
 
 	else
 
-		PT="-pacbio-raw"
+		PT="-pacbio"
 
 	fi
 
@@ -400,11 +400,9 @@ if ! [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
 	fi
 # adding version print statement
 	$CANU --version  
-	CANU="${CANU} -p ${ID} -d ${W_URL}/canu"
-# adding parameters corOutCoverage=5000 to retain mitochondrial contigs in canu/2.1
-	CANU="${CANU} corOutCoverage=5000"
-	CANU="${CANU} genomeSize=${GSIZE}"
-	CANU="${CANU} -gridEngineResourceOption=\"-R\\\"select[mem>${LSF_MEM}] rusage[mem=${LSF_MEM}]\\\" -M${LSF_MEM} -n ${NPROC}\""
+	CANU="${CANU} -p ${ID} -d ${W_URL}/canu  useGrid=false"
+	CANU="${CANU} genomeSize=${GSIZE} correctedErrorRate=0.035 utgOvlErrorRate=0.065 trimReadsCoverage=2 trimReadsOverlap=500 corOutCoverage=1000"
+#	CANU="${CANU} -gridEngineResourceOption=\"-R\\\"select[mem>${LSF_MEM}] rusage[mem=${LSF_MEM}]\\\" -M${LSF_MEM} -n ${NPROC}\""
 
 	if ! [[ -z ${FL} ]] && ! [[ -z ${PER} ]]; then
 
@@ -425,3 +423,6 @@ if ! [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
 fi
 
 wait
+
+#printf "==== Assembled contigs: \n"
+#grep '>' ${W_URL}/canu/${ID}.contigs.fasta

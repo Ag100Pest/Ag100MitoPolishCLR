@@ -14,8 +14,8 @@ mitoVGP=/project/ag100pest/software/modified_mitoVGP
 
 #=== Main program
 # printf "running on species $1 with jobid $2"
-SPECIES="Pectinophora_gossypiella" # hardcoded for now
-I="Pgos5"
+SPECIES=$1 #"Pectinophora_gossypiella" # hardcoded for now
+I=$2 #"Pgos5"
 
 mkdir -p /project/ag100pest/Pgos/RawData/MT_Contig/mitoVGP
 cd /project/ag100pest/Pgos/RawData/MT_Contig/mitoVGP

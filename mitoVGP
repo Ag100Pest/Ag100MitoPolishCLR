@@ -8,7 +8,7 @@ set -e -o pipefail
 #++++     Credit: Giulio Formenti gformenti@rockefeller.edu       ++++
 
 ##### mitoVGP dir for ag100pest added here
-mitoVGPdir=/home/amanda.stahlke/Pgos/RawData/MT_Contig/mitoVGP/mitoVGP_v2.2/mitoVGP
+mitoVGPdir=/project/ag100pest/Pgos/RawData/MT_Contig/mitoVGP/modified_mitoVGP
 
 if [ -z $1 ]; then
 
@@ -214,11 +214,11 @@ if ! [[ -z  ${OPTS} ]]; then
 fi
 
 #retrieve mito-like reads and assemble
-printf "\nCommand: sh -e scripts/mtDNApipe -s ${SPECIES} -i ${ID} -r ${filename}.fasta -g ${GSIZE} -t ${NPROC} ${SCRIPT1_OPTS}2>&1 | tee ${W_URL}/log/${ID}_mtDNApipe_$(date "+%Y%m%d-%H%M%S").out\n"
+printf "\nCommand: sh -e $mitoVGPdir/scripts/mtDNApipe -s ${SPECIES} -i ${ID} -r ${filename}.fasta -g ${GSIZE} -t ${NPROC} ${SCRIPT1_OPTS}2>&1 | tee ${W_URL}/log/${ID}_mtDNApipe_$(date "+%Y%m%d-%H%M%S").out\n"
 sh -e $mitoVGPdir/scripts/mtDNApipe -s ${SPECIES} -i ${ID} -r ${filename}.fasta -g ${GSIZE} -t ${NPROC} ${SCRIPT1_OPTS}2>&1 | tee ${W_URL}/log/${ID}_mtDNApipe_$(date "+%Y%m%d-%H%M%S").out &&
 
 #identify the mitocontig
-printf "\nCommand: sh -e scripts/blastMT -s ${SPECIES} -i ${ID} -r ${filename}.fasta 2>&1 | tee ${W_URL}/log/${ID}_blastMT_$(date "+%Y%m%d-%H%M%S").out\n"
+printf "\nCommand: sh -e $mitoVGPdir/scripts/blastMT -s ${SPECIES} -i ${ID} -r ${filename}.fasta 2>&1 | tee ${W_URL}/log/${ID}_blastMT_$(date "+%Y%m%d-%H%M%S").out\n"
 sh -e $mitoVGPdir/scripts/blastMT -s ${SPECIES} -i ${ID} -r ${filename}.fasta 2>&1 | tee ${W_URL}/log/${ID}_blastMT_$(date "+%Y%m%d-%H%M%S").out
 
 if [[ -z  ${CONTIG} ]]; then
@@ -259,11 +259,11 @@ if ! [[ -z  ${IL} ]]; then
 
 fi
 
-if ! [[ -z  ${DOWNL} ]]; then
+#if ! [[ -z  ${DOWNL} ]]; then
 
 	SCRIPT4_OPTS="${SCRIPT4_OPTS}-d ${DOWNL} "
-
-fi
+#
+#fi
 
 #polish the mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/map10x1 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT4_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_map10x1_$(date "+%Y%m%d-%H%M%S").out\n"
