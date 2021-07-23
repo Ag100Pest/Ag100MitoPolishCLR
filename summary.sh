@@ -30,6 +30,8 @@ printf "=== intermediate mito contigs assembled \n"
 grep '>' mitoVGP/${SPECIES}/${J}/assembly_MT_rockefeller/intermediates/canu/${J}.contigs.fasta
 ## lengths along the way
 ## mercury QV along the way
+sbatch $MERQ/_submit_merqury.sh .meryl Pgos_mtDNA_contig.fasta all_k20
+
 
 ## mitofinder
 MF=$MTDIR/mitofinder/$J/${J}_MitoFinder_mitfi_Final_Results

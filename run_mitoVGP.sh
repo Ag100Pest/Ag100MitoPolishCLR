@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -n 30
 #SBATCH -p short
-#SBATCH --job-name=CLR_mitoVGP         #<= name your job
+#SBATCH --job-name=CLR_mitoVGP        #<= name your job
 #SBATCH --output=R-%x.%J.out          # standard out goes to R-JOBNAME.12345.out
 #SBATCH --error=R-%x.%J.err           # standard error goes to R-JOBBNAME.12345.err
 #SBATCH --mail-user=amandastahlke@gmail.com    #<= Your email
@@ -42,10 +42,10 @@ printf "Job id is  $J \n"
 printf "Reference mt genome is $REF \n"
 printf "Input pacbio reads are $PB_LS \n"
 printf "Input pacbio reads are $I_LS \n"
-printf "Output is $OUT \n"
 
-OUT=/project/ag100pest/$SPECIES/RawData/MT_Contig/
-mkdir -p $OUT/mitoVGP
+printf "working directory = " $SLURM_SUBMIT_DIR
+
+#WD=/project/ag100pest/$SPECIES/RawData/MT_Contig
 
 ## pipeline is sensitive to canu version. throw error if not 2.1
 module load canu/2.1 #default is 2.1.1
