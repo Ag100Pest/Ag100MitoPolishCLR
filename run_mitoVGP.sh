@@ -22,11 +22,6 @@ if [[ ! -f ref.fasta ]] && \
 
 printf "Expects files: ref.fasta, PB_list.txt, and I_list.txt to be in working SLURM_SUBMIT_DIR.
 	Missing one of these."
-#        cat << EOF
-
-#        Usage: '$0 <SPECIES> <JOBID> <REF_MT> <PACBIO_LIST> <I_LIST>'
-#        Runs the modificed mitoVGP pipeline to assemble mitochondrial genomes from pacbio CRL and illumina polishing data
-#EOF
 
 exit 0
 
@@ -39,7 +34,9 @@ source activate $mitoVGP/pacbio_mitoVGP
 
 printf "Species ID is $1 \n"
 printf "Reference mt genome is $(head -n 1 ref.fasta) \n"
-printf "Input pacbio reads are $(cat PB_list.txt) \n"
+ibatch $MERQ/_submit_build.sh 31 $I_LS $J
+printf "Input pcabi files: ref.fasta, PB_list.txt, and I_list.txt to be in working SLURM_SUBMIT_DIR.
+        Missing one of these."s are $(cat PB_list.txt) \n"
 printf "Input pacbio reads are $(cat I_list.txt) \n"
 
 if [[ ! -z $SLURM_SUBMIT_DIR ]]; then
