@@ -24,16 +24,28 @@ mitoVGP=/project/ag100pest/software/modified_mitoVGP
 
 #=== Main program
 SPECIES=$1
-I=$2
-I_LS=$3
 WD=/project/ag100pest/$SPECIES/MT_Contig
 
-printf "Species is $SPECIES \n"
-printf "Job id is  $I \n"
-
-printf "Input illumina polish reads are $I_LS \n"
+printf "Species is $1 \n"
+printf "Species ID is  $2 \n"
 printf "Output is $WD \n"
-
 cd $WD
-sbatch $mitoVGP/run_mitoVGP.sh $I $REF $PB_LS $I_LS
+
+if [[ ! -f ref.fasta ]]; then
+        printf "missing ref.fasta in working dir. Expects file named ref.fasta"
+        exit 1
+fi
+
+if [[ ! -f PB_list.txt ]]; then
+        printf "missing PB_list.txt in working dir. Expects file named PB_list.txt"
+        exit 1
+fi
+
+if [[ ! -f I_list.txt ]]; then
+        printf "missing I_list.txt in working dir. Expects file named I_list.txt"
+        exit 1
+fi
+
+
+sbatch $mitoVGP/run_mitoVGP.sh $2
 
