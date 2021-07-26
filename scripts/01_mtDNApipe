@@ -70,17 +70,17 @@ printf "\n\n++++ running: mtDNApipe ++++\n\n"
 
 #set options
 
-while getopts ":a:s:i:r:g:c:f:o:m:t:d:p:1:" opt; do
+while getopts ":a:i:r:g:c:f:o:m:t:d:p:1:" opt; do
 
 	case $opt in
 		a)
 			PLATFORM="$OPTARG"
 			echo "Long read platform: -a $OPTARG"
 			;;
-		s)
-			SPECIES="$OPTARG"
-			echo "Species: -s $OPTARG"
-			;;
+		#s)
+		#	SPECIES="$OPTARG"
+		#	echo "Species: -s $OPTARG"
+		#	;;
         i)
         	ID="$OPTARG"
         	echo "Species ID: -i $OPTARG"
@@ -145,7 +145,7 @@ printf "\n"
 fi
 
 #define working directory
-W_URL=${SPECIES}/assembly_MT_rockefeller/intermediates
+W_URL=${ID}/assembly_MT_rockefeller/intermediates
 printf "Working directory: $W_URL\n\n"
 
 if [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
@@ -420,9 +420,9 @@ if ! [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
 	
 	printf "\n${CANU}\n"
 	eval ${CANU}
+
+	printf "==== Assembled contigs: \n"
+	grep '>' ${W_URL}/canu/${ID}.contigs.fasta
 fi
 
 wait
-
-#printf "==== Assembled contigs: \n"
-#grep '>' ${W_URL}/canu/${ID}.contigs.fasta

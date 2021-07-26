@@ -53,13 +53,13 @@ printf "\n\n++++ running: map10x1 ++++\n\n"
 
 #set options
 
-while getopts ":s:i:n:c:t:2:d:" opt; do
+while getopts ":i:n:c:t:2:d:" opt; do
 
 	case $opt in
-		s)
-			SPECIES="$OPTARG"
-			echo "Species: -s $OPTARG"
-			;;
+		#s)
+		#	SPECIES="$OPTARG"
+		#	echo "Species: -s $OPTARG"
+		#	;;
         i)
         	ID="$OPTARG"
         	echo "Species ID: -i $OPTARG"
@@ -105,7 +105,7 @@ fi
 
 
 #define working directory
-W_URL=${SPECIES}/${ID}/assembly_MT_rockefeller/intermediates
+W_URL=${ID}/assembly_MT_rockefeller/intermediates
 printf "Working directory: $W_URL\n\n"
 
 if [[ -e "${W_URL}/freebayes_round1/${ID}.${CONTIG}_polish2_10x1.fasta" ]]; then

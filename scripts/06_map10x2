@@ -50,13 +50,13 @@ printf "\n\n++++ running: map10x2 ++++\n\n"
 
 #set options
 
-while getopts ":s:i:n:c:t:" opt; do
+while getopts ":i:n:c:t:" opt; do
 
 	case $opt in
-		s)
-			SPECIES="$OPTARG"
-			echo "Species: -s $OPTARG"
-			;;
+		#s)
+		#	SPECIES="$OPTARG"
+		#	echo "Species: -s $OPTARG"
+		#	;;
         i)
         	ID="$OPTARG"
         	echo "Species ID: -i $OPTARG"
@@ -92,7 +92,7 @@ echo Running on `hostname`
 fi
 
 #define working directory
-W_URL=${SPECIES}/${ID}/assembly_MT_rockefeller/intermediates
+W_URL=${ID}/assembly_MT_rockefeller/intermediates
 printf "Working directory: $W_URL\n\n"
 
 FNAME="${ID}.${CONTIG}_polish2_10x1_trim1"

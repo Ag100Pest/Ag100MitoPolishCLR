@@ -47,10 +47,10 @@ printf "\n\n++++ running: trimmer ++++\n\n"
 while getopts ":s:i:n:c:t:s:z:" opt; do
 
 	case $opt in
-		s)
-			SPECIES="$OPTARG"
-			echo "Species: -s $OPTARG"
-			;;
+#		s)
+#			SPECIES="$OPTARG"
+#			echo "Species: -s $OPTARG"
+#			;;
         i)
         	ID="$OPTARG"
         	echo "Species ID: -i $OPTARG"
@@ -92,7 +92,7 @@ fi
 printf "\n"
 
 #define working directory
-W_URL=${SPECIES}/${ID}/assembly_MT_rockefeller/intermediates
+W_URL=${ID}/assembly_MT_rockefeller/intermediates
 printf "Working directory: $W_URL\n\n"
 
 FNAME="${ID}.${CONTIG}_polish2_10x1"
