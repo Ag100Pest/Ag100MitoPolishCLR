@@ -8,7 +8,7 @@ set -e -o pipefail
 #++++     Credit: Giulio Formenti gformenti@rockefeller.edu       ++++
 
 ##### mitoVGP dir for ag100pest added here
-mitoVGPdir=/project/ag100pest/Pgos/RawData/MT_Contig/mitoVGP/modified_mitoVGP
+mitoVGPdir=/project/ag100pest/software/modified_mitoVGP
 
 if [ -z $1 ]; then
 
@@ -61,7 +61,7 @@ fi
 
 #set options
 
-while getopts ":a:s:r:g:t:d:1:2:m:f:o:n:v:p:z:b:" opt; do
+while getopts ":a:i:s:r:g:t:d:1:2:m:f:o:n:v:p:z:b:" opt; do
 
 	case $opt in
 		a)
@@ -178,8 +178,7 @@ fi
 #if ! [[ -z  ${DOWNL} ]]; then
 #
 #	SCRIPT1_OPTS="${SCRIPT1_OPTS}-d ${DOWNL} "
-
-f#i
+#fi
 
 if ! [[ -z  ${FL} ]]; then
 
@@ -215,11 +214,11 @@ fi
 
 #retrieve mito-like reads and assemble
 printf "\nCommand: sh -e $mitoVGPdir/scripts/01_mtDNApipe -s ${SPECIES} -i ${ID} -r ${filename}.fasta -g ${GSIZE} -t ${NPROC} ${SCRIPT1_OPTS}2>&1 | tee ${W_URL}/log/${ID}_mtDNApipe_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/01_mtDNApipe -s ${SPECIES} -i ${ID} -r ${filename}.fasta -g ${GSIZE} -t ${NPROC} ${SCRIPT1_OPTS}2>&1 | tee ${W_URL}/log/${ID}_mtDNApipe_$(date "+%Y%m%d-%H%M%S").out &&
+sh -e $mitoVGPdir/scripts/01_mtDNApipe -i ${ID} -r ${filename}.fasta -g ${GSIZE} -t ${NPROC} ${SCRIPT1_OPTS}2>&1 | tee ${W_URL}/log/${ID}_mtDNApipe_$(date "+%Y%m%d-%H%M%S").out &&
 
 #identify the mitocontig
 printf "\nCommand: sh -e $mitoVGPdir/scripts/02_blastMT -s ${SPECIES} -i ${ID} -r ${filename}.fasta 2>&1 | tee ${W_URL}/log/${ID}_blastMT_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/02_blastMT -s ${SPECIES} -i ${ID} -r ${filename}.fasta 2>&1 | tee ${W_URL}/log/${ID}_blastMT_$(date "+%Y%m%d-%H%M%S").out
+sh -e $mitoVGPdir/scripts/02_blastMT -i ${ID} -r ${filename}.fasta 2>&1 | tee ${W_URL}/log/${ID}_blastMT_$(date "+%Y%m%d-%H%M%S").out
 
 if [[ -z  ${CONTIG} ]]; then
 
@@ -251,7 +250,7 @@ fi
 
 #polish the mitocontig with long reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/03_mitoPolish -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT3_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_mitoPolish_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/03_mitoPolish -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT3_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_mitoPolish_$(date "+%Y%m%d-%H%M%S").out &&
+sh -e $mitoVGPdir/scripts/03_mitoPolish -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT3_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_mitoPolish_$(date "+%Y%m%d-%H%M%S").out &&
 
 if ! [[ -z  ${IL} ]]; then
 
@@ -267,7 +266,7 @@ fi
 
 #polish the mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/04_map10x1 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT4_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_map10x1_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/04_map10x1 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT4_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_map10x1_$(date "+%Y%m%d-%H%M%S").out || { echo "polishing with shortreads failed"; exit 1; }
+sh -e $mitoVGPdir/scripts/04_map10x1 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT4_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_map10x1_$(date "+%Y%m%d-%H%M%S").out || { echo "polishing with shortreads failed"; exit 1; }
 
 if ! [[ -z  ${SEN} ]]; then
 
@@ -277,15 +276,15 @@ fi
 
 #trim the mitocontig
 printf "\nCommand: sh -e $mitoVGPdir/scripts/05_trimmer -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/05_trimmer -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; try trimming with MitoFinder"; exit 1; }
+sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; try trimming with MitoFinder"; exit 1; }
 
 #polish the trimmed mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/06_map10x2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_map10x2_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/06_map10x2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_map10x2._$(date "+%Y%m%d-%H%M%S").out &&
+sh -e $mitoVGPdir/scripts/06_map10x2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_map10x2._$(date "+%Y%m%d-%H%M%S").out &&
 
 #perform final end trimming
 printf "\nCommand: sh -e $mitoVGPdir/scripts/07_trimmer2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/07_trimmer2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out &&
+sh -e $mitoVGPdir/scripts/07_trimmer2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out &&
 
 ## Annotate in mitofinder
 #allow the final sequence to start with Phenylalanine

@@ -24,22 +24,21 @@ mitoVGP=/project/ag100pest/software/modified_mitoVGP
 
 #=== Main program
 SPECIES=$1
-J=$2
+I=$2
 REF=$3
 PB_LS=$4
 I_LS=$5
 WD=/project/ag100pest/$SPECIES/RawData/MT_Contig
 
 printf "Species is $SPECIES \n"
-printf "Job id is  $J \n"
+printf "Job id is  $I \n"
 printf "Reference mt genome is $REF \n"
 printf "Input pacbio reads are $PB_LS \n"
 printf "Input pacbio reads are $I_LS \n"
 printf "Output is $OUT \n"
 
-mkdir -p $WD/mitoVGP
-cd $WD/mitoVGP
-sbatch $mitoVGP/run_mitoVGP.sh $SPECIES $J $REF $PB_LS $I_LS
+cD $WD
+sbatch $mitoVGP/run_mitoVGP.sh $I $REF $PB_LS $I_LS
 
 #==== Prep for eval  with merqury
 #module load merqury/1.1
