@@ -145,7 +145,7 @@ printf "\n"
 fi
 
 #define working directory
-W_URL=${SPECIES}/${ID}/assembly_MT_rockefeller/intermediates
+W_URL=${SPECIES}/assembly_MT_rockefeller/intermediates
 printf "Working directory: $W_URL\n\n"
 
 if [[ -e "${W_URL}/canu/${ID}.contigs.fasta" ]]; then
