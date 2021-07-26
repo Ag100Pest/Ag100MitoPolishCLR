@@ -61,15 +61,15 @@ fi
 
 #set options
 
-while getopts ":a:s:i:r:g:t:d:1:2:m:f:o:n:v:p:z:b:" opt; do
+while getopts ":a:s:r:g:t:d:1:2:m:f:o:n:v:p:z:b:" opt; do
 
 	case $opt in
 		a)
 			PLATFORM="$OPTARG"
 			;;
-		s)
-			SPECIES="$OPTARG"
-			;;
+#		s)
+#			SPECIES="$OPTARG"
+#			;;
         i)
         	ID="$OPTARG"
             ;;
@@ -82,9 +82,9 @@ while getopts ":a:s:i:r:g:t:d:1:2:m:f:o:n:v:p:z:b:" opt; do
 		t)
 			NPROC="$OPTARG"
             ;;
-		d)
-			DOWNL="$OPTARG"
-            ;;
+#		d)
+#			DOWNL="$OPTARG"
+#            ;;
 		1)
 			READ1="$OPTARG"
 			;;
@@ -132,7 +132,7 @@ printf "\nWith command:\n"
 printf "\n${0}\n"
 
 #define working directory
-W_URL=${SPECIES}/assembly_MT_rockefeller/intermediates
+W_URL=${ID}/assembly_MT_rockefeller/intermediates
 
 if ! [[ -e "${W_URL}" ]]; then
 
@@ -175,11 +175,11 @@ if ! [[ -z  ${PLATFORM} ]]; then
 
 fi
 
-if ! [[ -z  ${DOWNL} ]]; then
+#if ! [[ -z  ${DOWNL} ]]; then
+#
+#	SCRIPT1_OPTS="${SCRIPT1_OPTS}-d ${DOWNL} "
 
-	SCRIPT1_OPTS="${SCRIPT1_OPTS}-d ${DOWNL} "
-
-fi
+f#i
 
 if ! [[ -z  ${FL} ]]; then
 
