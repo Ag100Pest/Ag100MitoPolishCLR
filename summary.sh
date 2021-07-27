@@ -17,20 +17,21 @@ exit 0
 
 fi
 
-#MTDIR=/project/ag100pest/$SPECIES/RawData/MT_Contig ## hopefully a consistent directory structure will exist across projects
 SPECIES=$1
-J=$2 #jobid
+J=$2 # species or job id
 
-MTDIR=/project/ag100pest/$SPECIES/RawData/MT_Contig ## hopefully a consistent directory structure will exist across projects
+MTDIR=/project/ag100pest/$SPECIES/MT_Contig ## hopefully a consistent directory structure will exist across projects
 
 ## what summary stats do we want from mitoVGP?
 ## read alignment rates
 ## number of canu contigs assembled
 printf "=== intermediate mito contigs assembled \n"
-grep '>' mitoVGP/${SPECIES}/${J}/assembly_MT_rockefeller/intermediates/canu/${J}.contigs.fasta
+grep '>' ${MTDIR}/${J}/assembly_MT_rockefeller/intermediates/canu/${J}.contigs.fasta
 ## lengths along the way
+
 ## mercury QV along the way
-sbatch $MERQ/_submit_merqury.sh .meryl Pgos_mtDNA_contig.fasta all_k20
+printf "===  \n"
+#sbatch $MERQ/_submit_merqury.sh .meryl Pgos_mtDNA_contig.fasta all_k20
 
 
 ## mitofinder
@@ -48,10 +49,11 @@ cat $MF/${J}.infos
 
 TBL=$MF/${J}_mtDNA_contig.tbl
 printf "=== Parsing $MF/${JOBID}_mtDNA_contig.tbl \n"
-printf "=== unique tRNAs:"
+printf "=== unique PCG (out of 13):"
+grep 'product' Otur_mtDNA_contig.tbl | grep -v tRNA  | grep -v ribosomal | uniq | wc -l
+printf "=== unique tRNAs (out of 22):"
 grep 'tRNA' $TBL | uniq | grep -c 'product'
-#grep 'tRNA' $TBL | uniq
-printf "=== unique ribosomal RNA: "
+printf "=== unique ribosomal RNA (out of 2): "
 grep 'ribosomal' $TBL | uniq  | wc -l
-printf "=== any notes"
+printf "=== any notes\n"
 grep 'note' $TBL -B 2

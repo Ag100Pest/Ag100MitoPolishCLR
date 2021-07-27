@@ -48,4 +48,3 @@ fi
 
 
 sbatch $mitoVGP/run_mitoVGP.sh $2
-

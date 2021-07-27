@@ -276,7 +276,10 @@ fi
 
 #trim the mitocontig
 printf "\nCommand: sh -e $mitoVGPdir/scripts/05_trimmer -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; try trimming with MitoFinder"; exit 1; }
+sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; try trimming with MitoFinder"
+	cp $(ls -t ${W_URL}/trimmed/*fasta | head -n 1) ${ID}/${ID}_prelim_MTcontig.fasta
+	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID
+	exit 1; }
 
 #polish the trimmed mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/06_map10x2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_map10x2_$(date "+%Y%m%d-%H%M%S").out\n"
@@ -284,7 +287,11 @@ sh -e $mitoVGPdir/scripts/06_map10x2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 |
 
 #perform final end trimming
 printf "\nCommand: sh -e $mitoVGPdir/scripts/07_trimmer2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/07_trimmer2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out &&
+sh -e $mitoVGPdir/scripts/07_trimmer2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out || { echo "trimmer2 failed; try trimming with MitoFinder"; 
+	|| { echo "trimming failed; try trimming with MitoFinder"
+        cp $(ls -t ${W_URL}/trimmed2/*.fasta | head -n 1) ${ID}/${ID}_prelim_MTcontig.fasta
+	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID
+        exit 1; }
 
 ## Annotate in mitofinder
 #allow the final sequence to start with Phenylalanine
@@ -293,3 +300,7 @@ sh -e $mitoVGPdir/scripts/07_trimmer2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 
 
 printf "\n\nDone!" &&
 printf "\n\nCompleted at: $(date "+%Y-%m-%d %H-%M-%S")\n\n"
+
+printf "\n\nStarting mitofinder from trimmed 2x polished 2x mitocontig"
+cp ${W_URL}/trimmed2/*trim2.fasta ${ID}/${ID}_prelim_MTcontig.fasta
+sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID

@@ -1,3 +1,5 @@
 *.DS_Store*
 dx_applets/.DS_Store
 pacbio_mitoVGP
+test
+mitofinder
