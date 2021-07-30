@@ -276,10 +276,11 @@ fi
 
 #trim the mitocontig
 printf "\nCommand: sh -e $mitoVGPdir/scripts/05_trimmer -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; try trimming with MitoFinder"
+sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; trimming with MitoFinder"
 	cp $(ls -t ${W_URL}/trimmed/*fasta | head -n 1) ${ID}/${ID}_prelim_MTcontig.fasta
-	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID
-	exit 1; }
+	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID}
+
+## add a qv check here to bring the mt back for another round of polishing if needed
 
 #polish the trimmed mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/06_map10x2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_map10x2_$(date "+%Y%m%d-%H%M%S").out\n"

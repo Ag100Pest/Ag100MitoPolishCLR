@@ -10,10 +10,10 @@ if [ -z $1 ]; then
         printf "Usage: '$0 <SPECIES_ID> '
         Submits a list of illumina files to create a meryl db.
         Expects file I_list.txt to be in working SLURM_SUBMIT_DIR \n"
-        exit 0
+        exit 1
 fi
 
-if [[ ! -f ref.fasta ]]; then
+if [[ ! -f I_list.txt ]]; then
 	printf "Expects file I_list.txt in working dir or SLURM_SUBMIT_DIR. Missing this file. Try again."
 else
 	printf "Illimuna reads in $(cat I_list.txt) \n"
