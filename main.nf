@@ -13,7 +13,7 @@ def helpMessage() {
    --species                      if a string is given, rename the final assembly by species name
    --ref			  NCBI locus ID for reference mt assembly to make seed fasta and genbank
    Optional modifiers
-   --k                            kmer to use in MerquryQV scoring [default:21]
+   --k                            kmer to use in MerquryQV scoring [default:31]
    --parallel_app                 Link to parallel executable [default: 'parallel']
    --bzcat_app                    Link to bzcat executable [default: 'bzcat']
    --pigz_app                     Link to pigz executable [default: 'pigz']
@@ -42,6 +42,24 @@ if (params.help || !params.species || !params.illumina_reads || !params.pacbio_r
   exit 0
 }
 
+// 00 Preprocess: Get NCBI ref fasta anad genbank
+process getref {
+    publishDir "${params.outdir}/00_ref", mode: 'copy'
+    input:  val(ref_ch)
+    output: tuple val(reffasta), val(refgb) 
+    script:
+    template 'getref.sh'
+}
+
+// 00 Preprocess: Create meryl db for qv
+process meryldb {
+    publishDir "${params.outdir}/qv", mode: 'symlink'
+    input:  tuple val(k) val(ill_ch) val(species)
+    output: path("*") 
+    script:
+    template 'meryldb.sh'
+}
+
 workflow {
     // Setup input channels, species name (sp), reference id (ref),  Illumina reads (ill), and pacbio reads (pac)
     sp_ch  = channel.of(params.species, checkIfExists:true)
@@ -50,12 +68,12 @@ workflow {
     pac_ch = channel.fromPath(params.pacbio_reads, checkIfExists:true)
     // k_ch   = channel.of(params.k) // Either passed in or autodetect (there's a script for this)
 
-    // Step 0: Preprocess illumina files from bz2 to gz files
-    // Instead of a flag, auto detect, however it must be in the pattern, * will fail
-    if(params.illumina_reads =~ /bz2$/){
-      pill_ch = ill_ch | bz_to_gz | map { n -> n.get(1) } | flatten
-    }else{
-      pill_ch = ill_ch | map { n -> n.get(1) } | flatten
+   // 00 Preprocess: Get NCBI ref fasta anad genbank
+   ref_ch | getref
+
+   // 00 Preprocess: Create meryl db for qv
+   ill_ch | meryldb 
+
     }
 
 

@@ -132,7 +132,7 @@ printf "\nWith command:\n"
 printf "\n${0}\n"
 
 #define working directory
-W_URL=${ID}/assembly_MT_rockefeller/intermediates
+W_URL=assembly_MT/intermediates
 
 if ! [[ -e "${W_URL}" ]]; then
 
