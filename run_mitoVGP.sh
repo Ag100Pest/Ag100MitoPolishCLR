@@ -59,5 +59,4 @@ $mitoVGP/mitoVGP -a pacbio \
 	-i $1 -r ref.fasta \
 	-t 30 \
 	-1 PB_list.txt \
-	-2 I_list.txt \
-	-z 5000 # increases sesnitivity of mummer
+	-2 I_list.txt 

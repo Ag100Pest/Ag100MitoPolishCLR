@@ -2,7 +2,7 @@
 
 set -e -o pipefail
 
-#++++                  This script is part of:                    ++++
+#++++                  This script is modified from:              ++++
 #++++                        mitoVGP v2.2                         ++++
 #++++ The Vertebrate Genomes Project Mitogenome Assembly Pipeline ++++
 #++++     Credit: Giulio Formenti gformenti@rockefeller.edu       ++++
@@ -13,12 +13,12 @@ mitoVGPdir=/project/ag100pest/software/modified_mitoVGP
 if [ -z $1 ]; then
 
 	echo "use $0 -h for help"
-	exit 0
+	exit 0;
 elif [ $1 == "-h" ]; then
 
 	cat << EOF
 
-	Usage: '$0 -s species -i species_ID -r reference -t threads'
+	Usage: '$0  -i species_ID -r reference -t threads'
 
 	mitoVGP is used for reference-guided de novo mitogenome assembly using a combination of long and short read data.
 	
@@ -34,8 +34,7 @@ elif [ $1 == "-h" ]; then
 
 	Required arguments are:
 		-a long read sequencing platform (Pacbio/ONT)
-		-s the species name (e.g. Calypte_anna)
-		-i the VGP species ID (e.g. bCalAnn1)
+		-i a species ID (e.g. bCalAnn1)
 		-r the reference sequence fasta file
 		-t the number of threads
 	
@@ -61,15 +60,12 @@ fi
 
 #set options
 
-while getopts ":a:i:s:r:g:t:d:1:2:m:f:o:n:v:p:z:b:" opt; do
+while getopts ":a:i:r:g:t:1:2:m:f:o:n:v:p:z:b:" opt; do
 
 	case $opt in
 		a)
 			PLATFORM="$OPTARG"
 			;;
-#		s)
-#			SPECIES="$OPTARG"
-#			;;
         i)
         	ID="$OPTARG"
             ;;
@@ -82,9 +78,6 @@ while getopts ":a:i:s:r:g:t:d:1:2:m:f:o:n:v:p:z:b:" opt; do
 		t)
 			NPROC="$OPTARG"
             ;;
-#		d)
-#			DOWNL="$OPTARG"
-#            ;;
 		1)
 			READ1="$OPTARG"
 			;;
@@ -132,7 +125,7 @@ printf "\nWith command:\n"
 printf "\n${0}\n"
 
 #define working directory
-W_URL=assembly_MT/intermediates
+W_URL=${ID}/assembly_MT_rockefeller/intermediates
 
 if ! [[ -e "${W_URL}" ]]; then
 
@@ -166,7 +159,11 @@ if [[ -z  ${GSIZE} ]]; then
 	GSIZE=$(awk 'BEGIN {FS="\t"} $0 !~ ">" {sum+=length($0)} END {print sum}' ${W_URL}/reference/${filename}.fasta)
 	
 	printf "\nGenome size not provided, using reference genome size: ${GSIZE} bp\n"
-	
+
+	if [[ -z  ${FL} ]]; then
+	FL=$(python -c "print(round(1.5*$GSIZE))")
+	printf "\nWill filter reads longer than $FL \n"
+	fi
 fi
 
 if ! [[ -z  ${PLATFORM} ]]; then
@@ -175,10 +172,6 @@ if ! [[ -z  ${PLATFORM} ]]; then
 
 fi
 
-#if ! [[ -z  ${DOWNL} ]]; then
-#
-#	SCRIPT1_OPTS="${SCRIPT1_OPTS}-d ${DOWNL} "
-#fi
 
 if ! [[ -z  ${FL} ]]; then
 
@@ -211,6 +204,11 @@ if ! [[ -z  ${OPTS} ]]; then
 	SCRIPT1_OPTS="${SCRIPT1_OPTS}-o ${OPTS} "
 
 fi
+
+
+printf "\nWill use '${IL}' for short read polishing\n"
+
+
 
 #retrieve mito-like reads and assemble
 printf "\nCommand: sh -e $mitoVGPdir/scripts/01_mtDNApipe -s ${SPECIES} -i ${ID} -r ${filename}.fasta -g ${GSIZE} -t ${NPROC} ${SCRIPT1_OPTS}2>&1 | tee ${W_URL}/log/${ID}_mtDNApipe_$(date "+%Y%m%d-%H%M%S").out\n"
@@ -250,23 +248,11 @@ fi
 
 #polish the mitocontig with long reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/03_mitoPolish -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT3_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_mitoPolish_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/03_mitoPolish -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT3_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_mitoPolish_$(date "+%Y%m%d-%H%M%S").out &&
-
-if ! [[ -z  ${IL} ]]; then
-
-	SCRIPT4_OPTS="${SCRIPT4_OPTS}-2 ${IL} "
-
-fi
-
-#if ! [[ -z  ${DOWNL} ]]; then
-
-	SCRIPT4_OPTS="${SCRIPT4_OPTS}-d ${DOWNL} "
-#
-#fi
+sh -e $mitoVGPdir/scripts/03_mitoPolish -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT3_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_mitoPolish_$(date "+%Y%m%d-%H%M%S").out 
 
 #polish the mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/04_map10x1 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT4_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_map10x1_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/04_map10x1 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT4_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_map10x1_$(date "+%Y%m%d-%H%M%S").out || { echo "polishing with shortreads failed"; exit 1; }
+sh -e $mitoVGPdir/scripts/04_map10x1 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} -2 ${IL} ${SCRIPT4_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_map10x1_$(date "+%Y%m%d-%H%M%S").out || { echo "polishing with shortreads failed"; exit 1; }
 
 if ! [[ -z  ${SEN} ]]; then
 
@@ -277,9 +263,9 @@ fi
 #trim the mitocontig
 printf "\nCommand: sh -e $mitoVGPdir/scripts/05_trimmer -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out\n"
 sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; try trimming with MitoFinder"
-	cp $(ls -t ${W_URL}/trimmed/*fasta | head -n 1) ${ID}/${ID}_prelim_MTcontig.fasta
-	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID
-	exit 1; }
+	cp $(ls -t ${W_URL}/trimmed/*fasta | head -n 1) ${ID}/${ID}_trim1_prelim_MTcontig.fasta
+	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_trim1_prelim_MTcontig.fasta $ID
+	exit 0;}
 
 #polish the trimmed mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/06_map10x2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_map10x2_$(date "+%Y%m%d-%H%M%S").out\n"
@@ -287,20 +273,16 @@ sh -e $mitoVGPdir/scripts/06_map10x2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 |
 
 #perform final end trimming
 printf "\nCommand: sh -e $mitoVGPdir/scripts/07_trimmer2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out\n"
-sh -e $mitoVGPdir/scripts/07_trimmer2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out || { echo "trimmer2 failed; try trimming with MitoFinder"; 
-	|| { echo "trimming failed; try trimming with MitoFinder"
-        cp $(ls -t ${W_URL}/trimmed2/*.fasta | head -n 1) ${ID}/${ID}_prelim_MTcontig.fasta
-	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID
-        exit 1; }
+sh -e $mitoVGPdir/scripts/07_trimmer2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out || \
+	{ echo "trimmer2 failed; try trimming with MitoFinder"; 
+        cp $(ls -t ${W_URL}/trimmed2/*.fasta | head -n 1) ${ID}/${ID}_trim2_prelim_MTcontig.fasta
+	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_trim2_prelim_MTcontig.fasta $ID 
+	exit 0;}
 
-## Annotate in mitofinder
-#allow the final sequence to start with Phenylalanine
-#printf "\nCommand: sh -e $mitoVGPdir/scripts/linearizePhe -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_trimmer2_$(date "+%Y%m%d-%H%M%S").out\n"
-#sh -e $mitoVGPdir/scripts/linearizePhe -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_linearizePhe_$(date "+%Y%m%d-%H%M%S").out &&
 
-printf "\n\nDone!" &&
-printf "\n\nCompleted at: $(date "+%Y-%m-%d %H-%M-%S")\n\n"
+printf "\n\nDone!"
+printf "\n\nCompleted mitocontig assembly at: $(date "+%Y-%m-%d %H-%M-%S")\n\n"
 
 printf "\n\nStarting mitofinder from trimmed 2x polished 2x mitocontig"
-cp ${W_URL}/trimmed2/*trim2.fasta ${ID}/${ID}_prelim_MTcontig.fasta
-sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID
+cp ${W_URL}/${ID}/trimmed2/*trim2.fasta ${ID}/${ID}_prelim_MTcontig.fasta
+sh $mitoVGPdir/run_MitoFinder_annt.sh ${ID}_prelim_MTcontig.fasta $ID || {printf "annotation with MitoFinder Failed"; exit 1;}

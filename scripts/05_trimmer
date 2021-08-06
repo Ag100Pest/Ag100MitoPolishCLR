@@ -106,7 +106,7 @@ fi
 
 if [[ -z ${SEN} ]]; then
 
-	SEN=500
+	SEN=5000
 
 fi
 

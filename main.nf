@@ -54,10 +54,18 @@ process getref {
 // 00 Preprocess: Create meryl db for qv
 process meryldb {
     publishDir "${params.outdir}/qv", mode: 'symlink'
-    input:  tuple val(k) val(ill_ch) val(species)
+    input:  tuple val(k) val(ill_ch)
     output: path("*") 
     script:
     template 'meryldb.sh'
+}
+
+//
+process merylsubset{
+   publishDir "${params.outdir}/qv", mode: 'symlink' //maybe this doesn't need to be published
+   input: val(meryldb)
+   output: val(subsetmeryldb)  
+   template 'merylsubset.sh'
 }
 
 workflow {
@@ -66,6 +74,7 @@ workflow {
     ref_ch = channel.of(params.ref, checkIfExists:true)
     ill_ch = channel.fromFilePairs(params.illumina_reads, checkIfExists:true)
     pac_ch = channel.fromPath(params.pacbio_reads, checkIfExists:true)
+
     // k_ch   = channel.of(params.k) // Either passed in or autodetect (there's a script for this)
 
    // 00 Preprocess: Get NCBI ref fasta anad genbank
