@@ -284,5 +284,7 @@ printf "\n\nDone!"
 printf "\n\nCompleted mitocontig assembly at: $(date "+%Y-%m-%d %H-%M-%S")\n\n"
 
 printf "\n\nStarting mitofinder from trimmed 2x polished 2x mitocontig"
-cp ${W_URL}/${ID}/trimmed2/*trim2.fasta ${ID}/${ID}_prelim_MTcontig.fasta
-sh $mitoVGPdir/run_MitoFinder_annt.sh ${ID}_prelim_MTcontig.fasta $ID || {printf "annotation with MitoFinder Failed"; exit 1;}
+	cp ${W_URL}/trimmed2/${ID}.${CONTIG_ID}_polish2_10x1_trim1_10x2_trim2.fasta ${ID}_prelim_MTcontig.fasta
+
+sh $mitoVGPdir/run_MitoFinder_annt.sh ${ID}_prelim_MTcontig.fasta $ID || \
+ { printf "annotation with MitoFinder Failed"; exit 1; }
