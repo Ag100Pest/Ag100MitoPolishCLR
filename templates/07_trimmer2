@@ -119,7 +119,7 @@ fi
 
 if ! [[ -e "${W_URL}/trimmed2/${FNAME}.delta" ]]; then
 
-	nucmer --maxmatch --nosimplify ${W_URL}/trimmed2/${FNAME}.fasta ${W_URL}/trimmed2/${FNAME}.fasta -f -p "${W_URL}/trimmed2/${FNAME}" -b 5000 
+	nucmer --maxmatch --nosimplify ${W_URL}/trimmed2/${FNAME}.fasta ${W_URL}/trimmed2/${FNAME}.fasta -f -p "${W_URL}/trimmed2/${FNAME}" -b 500 
 
 fi
 

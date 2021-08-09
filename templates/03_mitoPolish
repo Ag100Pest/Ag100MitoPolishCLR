@@ -138,7 +138,7 @@ fi
 
 printf "\n--First round of polishing:\n\n"
 
-if ! [[ -f "${W_URL}/polish/polish_round1/uBAM1.bam" ]]; then
+if ! [[ -e "${W_URL}/polish/polish_round1" ]]; then
 
 	mkdir -p ${W_URL}/polish/polish_round1
 
@@ -168,23 +168,18 @@ if ! [[ -f "${W_URL}/polish/polish_round1/uBAM1.bam" ]]; then
 		dataset create --type SubreadSet --name ${ID} ${W_URL}/polish/polish_round1/${ID}_read_set.xml ${W_URL}/tgs_bam/*.subreads.bam
 	
 		pbmerge ${W_URL}/polish/polish_round1/${ID}_read_set.xml -o ${W_URL}/polish/polish_round1/BAM1.bam
-
 	
 		picard RevertSam I=${W_URL}/polish/polish_round1/BAM1.bam O=${W_URL}/polish/polish_round1/uBAM1.bam MAX_DISCARD_FRACTION=0.005 ATTRIBUTE_TO_CLEAR=XT ATTRIBUTE_TO_CLEAR=XN ATTRIBUTE_TO_CLEAR=AS ATTRIBUTE_TO_CLEAR=OC ATTRIBUTE_TO_CLEAR=OP SORT_ORDER=unsorted RESTORE_ORIGINAL_QUALITIES=true REMOVE_DUPLICATE_INFORMATION=true REMOVE_ALIGNMENT_INFORMATION=true VALIDATION_STRINGENCY=${VAL}
-fi
-
-if ! [[ -f "${W_URL}/polish/polish_round1/${ID}.realigned_raw_reads.bam" ]]; then
 	
 		pbmm2 align --best-n 1 ${W_URL}/polish/polish_round1/${ID}.${CONTIG}.fasta.mmi ${W_URL}/polish/polish_round1/uBAM1.bam ${W_URL}/polish/polish_round1/${ID}.realigned_raw_reads.bam -j ${NPROC}
-fi
 
-		if ! [[ -f "${W_URL}/polish/polish_round1/picard/${ID}.${CONTIG}_polish.fasta" ]]; then
+		if ! [[ -e "${W_URL}/polish/polish_round1/picard" ]]; then
 
 			mkdir -p ${W_URL}/polish/polish_round1/picard
 
 		fi
-		
-#extract reads used by Canu using their names
+
+		#extract reads used by Canu using their names
 		samtools view -H ${W_URL}/polish/polish_round1/${ID}.realigned_raw_reads.bam | sed "s/SO:UNKNOWN/SO:unknown/g" | samtools reheader - ${W_URL}/polish/polish_round1/${ID}.realigned_raw_reads.bam > ${W_URL}/polish/polish_round1/picard/${ID}.realigned_raw_reads_rh.bam
 		picard FilterSamReads I=${W_URL}/polish/polish_round1/picard/${ID}.realigned_raw_reads_rh.bam O=${W_URL}/polish/polish_round1/picard/${ID}.realigned_raw_reads_rh_${CONTIG}.bam READ_LIST_FILE=${W_URL}/polish/polish_round1/${ID}_${CONTIG}_names.txt FILTER=includeReadList VALIDATION_STRINGENCY=${VAL}
 
@@ -203,27 +198,24 @@ fi
 	
 		${CAL} ${W_URL}/polish/polish_round1/picard/${ID}.realigned_raw_reads_rh_${CONTIG}_sorted.bam -r ${W_URL}/polish/polish_round1/${ID}.${CONTIG}.fasta -o ${W_URL}/polish/polish_round1/${ID}.${CONTIG}_polish.fasta --algorithm=arrow -j ${NPROC}
 
-
-if [[ ${PLATFORM} == "ONT" ]]; then
-	
+	else
 
 		zcat ${W_URL}/tgs_MT_extracted_reads/*${ID}.fastq.gz | grep -A3 -f ${W_URL}/polish/polish_round1/${ID}_${CONTIG}_names.txt --no-group-separator > ${W_URL}/polish/polish_round1/${ID}.fastq
 		
 		minimap2 -x map-ont ${W_URL}/polish/polish_round1/${ID}.${CONTIG}.fasta ${W_URL}/polish/polish_round1/${ID}.fastq -t ${NPROC} -o ${W_URL}/polish/polish_round1/${ID}.paf --secondary=no
 
 		racon ${W_URL}/polish/polish_round1/${ID}.fastq ${W_URL}/polish/polish_round1/${ID}.paf ${W_URL}/polish/polish_round1/${ID}.${CONTIG}.fasta -m 8 -x -6 -g -8 -w 500  -t ${NPROC} > ${W_URL}/polish/polish_round1/${ID}.${CONTIG}_polish.fasta 
+	
 	fi
 
 
 fi
 
-if  [[ -f "${W_URL}/polish/polish_round1/picard/${ID}.${CONTIG}_polish.fasta" ]]; then
 printf "\n--First round completed.\n"
-fi
 
 printf "\n--Second round of polishing:\n\n"
 
-if ! [[ -f "${W_URL}/polish/polish_round2/${ID}.${CONTIG}_polish2.fasta" ]]; then
+if ! [[ -e "${W_URL}/polish/polish_round2" ]]; then
 
 	if [[ ${PLATFORM} == "pacbio" ]]; then
 	

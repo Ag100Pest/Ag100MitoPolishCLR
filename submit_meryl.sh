@@ -19,6 +19,10 @@ else
 	printf "Illimuna reads in $(cat I_list.txt) \n"
 fi
 
-printf "out meryl db in ${1}.k31.meryl \n"
+mkdir -p qv
+cd qv
+pwd
+
+printf "out meryl db in ${PWD}/${1}.k31.meryl \n"
 
 sbatch $MERQ/_submit_build.sh 31 I_list.txt $1
