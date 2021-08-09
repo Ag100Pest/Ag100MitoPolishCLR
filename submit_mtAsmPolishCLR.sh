@@ -52,5 +52,4 @@ sbatch $mitoVGP/run_mitoVGP.sh $2
 ## make meryl db for qv
 mkdir -p $WD/qv
 ln -s $WD/I_list.txt $WD/qv
-cd $WD/qv
-sbatch  $mitoVGP/submit_meryl.sh $2
+sh  $mitoVGP/submit_meryl.sh $2
