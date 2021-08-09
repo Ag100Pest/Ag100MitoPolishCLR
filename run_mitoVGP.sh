@@ -34,7 +34,7 @@ if [[ ! -f I_list.txt ]]; then
         printf "missing I_list.txt in working dir. Expects file named I_list.txt"
         exit 1
 else
-printf "Input pacbio files: $(cat I_list.txt) \n"
+printf "Input polishing files: $(cat I_list.txt) \n"
 
 fi
 

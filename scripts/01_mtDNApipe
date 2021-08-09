@@ -42,7 +42,6 @@ elif [ $1 == "-h" ]; then
 
 	Required arguments are:
 	-a long read sequencing platform (pacbio/ONT)
-	-s the species name (e.g. Calypte_anna)
 	-i the VGP species ID (e.g. bCalAnn1)
 	-r the reference sequence fasta file
 	-g the putative mitogenome size (potentially, that of the reference genome). It does not
