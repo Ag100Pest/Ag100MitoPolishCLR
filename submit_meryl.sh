@@ -13,12 +13,16 @@ if [ -z $1 ]; then
         exit 0
 fi
 
-if [[ ! -f ref.fasta ]]; then
+if [[ ! -f I_list.txt ]]; then
 	printf "Expects file I_list.txt in working dir or SLURM_SUBMIT_DIR. Missing this file. Try again."
 else
 	printf "Illimuna reads in $(cat I_list.txt) \n"
 fi
 
-printf "out meryl db in ${1}.k31.meryl \n"
+mkdir -p qv
+cd qv
+pwd
+
+printf "out meryl db in ${PWD}/${1}.k31.meryl \n"
 
 sbatch $MERQ/_submit_build.sh 31 I_list.txt $1
