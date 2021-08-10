@@ -2,10 +2,15 @@
 
 set -e -o pipefail
 
-#++++                  This script is part of:                    ++++
+#++++                  This script is modified from               ++++
 #++++                        mitoVGP v2.2                         ++++
 #++++ The Vertebrate Genomes Project Mitogenome Assembly Pipeline ++++
 #++++     Credit: Giulio Formenti gformenti@rockefeller.edu       ++++
+
+
+##### mitoVGP dir for ag100pest added here
+mitoVGPdir=/project/ag100pest/software/modified_mitoVGP
+
 
 if [ -z $1 ]; then
 
@@ -15,7 +20,7 @@ elif [ $1 == "-h" ]; then
 
 	cat << EOF
 
-	Usage: '$0 -s species -i species_ID -r reference -g genome_size -t threads -m mapper (optional) -1 filelist (optional) -c cluster (optional)'
+	Usage: '$0 -i species_ID -r reference -g genome_size -t threads -m mapper (optional) -1 filelist (optional) -c cluster (optional)'
 
 	mtDNApipe is used to retrieve mitochondrial-like sequences from the raw Pacbio data
 	generated in the framework of the Vertebrate Genomes Project and assemble them using Canu.
@@ -35,15 +40,13 @@ elif [ $1 == "-h" ]; then
 
 	In the second steps reads are used to generate assemblies using Canu assembler,
 	usually with default parameters.
-	(for rGopEvg1 and mRhiFer1 minOverlapLength=300 correctedErrorRate=0.105 were used, respectively)
 
 	The reference genome provided by the user is then blasted to the contigs generated
 	by Canu to identify the putative mitocontig.
 
 	Required arguments are:
 	-a long read sequencing platform (pacbio/ONT)
-	-s the species name (e.g. Calypte_anna)
-	-i the VGP species ID (e.g. bCalAnn1)
+	-i a species ID (e.g. bCalAnn1)
 	-r the reference sequence fasta file
 	-g the putative mitogenome size (potentially, that of the reference genome). It does not
 	need to be precise. Accepts Canu formatting.
@@ -70,35 +73,31 @@ printf "\n\n++++ running: mtDNApipe ++++\n\n"
 
 #set options
 
-while getopts ":a:i:r:g:c:f:o:m:t:d:p:1:" opt; do
+while getopts ":a:i:r:g:c:f:o:m:t:p:1:" opt; do
 
 	case $opt in
 		a)
 			PLATFORM="$OPTARG"
 			echo "Long read platform: -a $OPTARG"
 			;;
-		#s)
-		#	SPECIES="$OPTARG"
-		#	echo "Species: -s $OPTARG"
-		#	;;
-        i)
-        	ID="$OPTARG"
-        	echo "Species ID: -i $OPTARG"
-            ;;
-        r)
+	        i)
+        		ID="$OPTARG"
+        		echo "Species ID: -i $OPTARG"
+            		;;
+	        r)
 			REF="$OPTARG"
 			echo "Reference: -r $OPTARG"
 			;;
 		g)
 			GSIZE="$OPTARG"
 			echo "Genome size: -g $OPTARG"
-            ;;
+			;;
 		c)
-            GRID="$OPTARG"
+			GRID="$OPTARG"
 			echo "Cluster: -c $OPTARG"
 			;;
 		f)
-            FL="$OPTARG"
+			FL="$OPTARG"
 			echo "Read length filter: -f $OPTARG"
 			;;
 		m)
@@ -108,21 +107,17 @@ while getopts ":a:i:r:g:c:f:o:m:t:d:p:1:" opt; do
 		t)
 			NPROC="$OPTARG"
 			echo "Number of threads: -t $OPTARG"
-            ;;
-		d)
-			DOWNL="$OPTARG"
-			echo "Multithreaded download: -d $OPTARG"
-            ;;
+			;;
 		p)
 			PER=$OPTARG
 			echo "Percent coverage of reads: -p > $OPTARG"
-            ;;
+			;;
 		1)
 			READ1="$OPTARG"
 			echo "Local long read data: -1 $OPTARG"
 			;;
 		o)
-            OPTS="$OPTARG"
+			OPTS="$OPTARG"
 			echo "Canu options: -o ${OPTARG//_/ }"
 			;;
 		\?)
@@ -161,19 +156,27 @@ dw_date=`date "+%Y%m%d-%H%M%S"`;
 if  [[ -z ${READ1} ]]; then
 	
 printf "Missing long read file. Supply list of long reads as -1 <PB_list.txt>"
-    #record Pacbio raw data files available in the cloud at the time of the analysis
-#    printf "Collecting data using: aws s3 ls s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/\n\n"
-#    aws s3 --no-sign-request ls s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/ | grep -oP "m.*.subreads.bam" | uniq > ${W_URL}/log/long_reads_file_list_$dw_date.txt
-
 else
 
     cat ${READ1} > ${W_URL}/log/long_reads_file_list_$dw_date.txt
 
 fi
 
+
+
+if [[ -z  ${GSIZE} ]]; then
+	GSIZE=$(awk 'BEGIN {FS="\t"} $0 !~ ">" {sum+=length($0)} END {print sum}' ${W_URL}/reference/${filename}.fasta)
+
+	printf "\nGenome size not provided, using reference genome size: ${GSIZE} bp\n"
+	if [[ -z  ${FL} ]]; then
+	FL=$(python -c "print(round(1.5*$GSIZE))")
+	printf "\nWill filter reads longer than $FL \n"
+	fi
+fi
+
 if ! [[ -e "${W_URL}/tgs_bam" ]]; then
 
-mkdir ${W_URL}/tgs_bam
+	mkdir ${W_URL}/tgs_bam
 
 fi
 
@@ -193,14 +196,6 @@ if [[  ${ALN} == "pbmm2" ]] && ! [[ -e ${W_URL}/reference/${REF%.*}.fasta.mmi ]]
 
 fi
 
-## Can probably take all of this out
-#if vgp mode download
-#if [[ -z ${READ1} ]] && [[ ${DOWNL} == true ]] && ! [[ "$(ls -A ${W_URL}/tgs_bam)" ]] ; then
-
-#	aws s3 --no-sign-request cp --recursive --exclude="*scrap*" --exclude="*xml*" --exclude="*bai*" --exclude="*pbi*" --include="*.subreads.bam" s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/ ${W_URL}/
-
-#fi
-
 printf "\n--Following long read files found:\n"
 
 while read p; do
@@ -218,14 +213,7 @@ if ! [[ -e "${W_URL}/tgs_bam/aligned_$(basename -- "${p%.*}").bam" ]] && ! [[ $p
 	
 	if [[ -z ${READ1} ]]; then
 		printf "missing READ1"
-		#if [[ -z ${DOWNL} ]] || ! [[  ${DOWNL} == true ]]; then
-
-			## if vgp mode download
-			## aws s3 --no-sign-request cp s3://genomeark/species/${SPECIES}/${ID}/genomic_data/pacbio/$p ${W_URL}/
-			#align
-			
-		#fi
-
+		exit 1
 	else
 		
 		ln -sf $p ${W_URL}/$(basename -- "$p")

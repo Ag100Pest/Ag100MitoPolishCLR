@@ -116,7 +116,7 @@ while getopts ":a:i:r:g:t:1:2:m:f:o:n:v:p:z:b:" opt; do
 
 done
 
-printf "\n\n++++                        mitoVGP v2.0                         ++++\n"
+printf "\n\n++++                 modified  mitoVGP v2.0                  ++++\n"
 printf "++++ The Vertebrate Genomes Project Mitogenome Assembly Pipeline ++++\n"
 printf "++++     Credit: Giulio Formenti gformenti@rockefeller.edu       ++++\n\n"
 
