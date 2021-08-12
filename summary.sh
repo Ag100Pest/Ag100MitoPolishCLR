@@ -1,4 +1,13 @@
 #!/bin/bash
+#SBATCH -n 30
+#SBATCH -p short
+#SBATCH --job-name=summarize       #<= name your job
+#SBATCH --output=R-%x.%J.out          # standard out goes to R-JOBNAME.12345.out
+#SBATCH --error=R-%x.%J.err           # standard error goes to R-JOBBNAME.12345.err
+#SBATCH --mail-user=amandastahlke@gmail.com    #<= Your email
+#SBATCH --mail-type=begin
+#SBATCH --mail-type=end
+
 if [ -z $1 ]; then
 
         printf "Usage: '$0 <SPECIES> <JOBID>'
@@ -18,16 +27,14 @@ exit 0
 fi
 
 J=$1
-#J=$2 # species or job id
 
-printf "Summarize the successful run outputs of mito assmbly and annotation for $1 \n\n\n"
+printf "Summary of mito assmbly and annotation for $1 \n\n\n"
 
 ## what summary stats do we want from mitoVGP?
-## read alignment rates
+
 ## number of canu contigs assembled
 printf "=== intermediate mito contigs assembled \n"
 grep '>' ${1}/assembly_MT_rockefeller/intermediates/canu/${J}.contigs.fasta
-## lengths along the way
 
 ## mercury QV along the way
 printf "\n\n=== merqury qv along the way \n"
@@ -40,14 +47,15 @@ cat qv/${1}_mt_gt100.qv
 MF=mitofinder/$J/${J}_MitoFinder_mitfi_Final_Results
 [ ! -d "$MF" ] && echo "$MF does not exist" && exit 
 
-printf "\n\n=== MitoFinder Final Results in mitofinder \n"
+printf "\n\n=== MitoFinder Final Results in ${MF}/mitofinder \n"
+printf "Note: Circularization in mitofinder is looking for overlaps. \n
+These have likely already been trimmed in mitoVGP. \n"
+
 cat $MF/${J}.infos 
 # inital contig name
 # final length
 # GC content
 # Circularization
-
-## Are all tRNAs uniquely represented?
 
 TBL=$MF/${J}_mtDNA_contig.tbl
 printf "\n\n=== Parsing $MF/${J}_mtDNA_contig.tbl \n"
