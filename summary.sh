@@ -44,7 +44,7 @@ printf "=======================================================\n"
 cat qv/${1}_mt_gt100.qv
 
 ## mitofinder
-MF=mitofinder/$J/${J}_MitoFinder_mitfi_Final_Results
+MF=$J/${J}_MitoFinder_mitfi_Final_Results
 [ ! -d "$MF" ] && echo "$MF does not exist" && exit 
 
 printf "\n\n=== MitoFinder Final Results in ${MF}/mitofinder \n"

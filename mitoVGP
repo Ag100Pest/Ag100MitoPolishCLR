@@ -314,6 +314,6 @@ wait_file() {
 
 wait_file ${ID}_mt_gt100.qv
 
-sbatch $mitoVGPdir/summary.sh $ID
+sh $mitoVGPdir/summary.sh $ID > ${ID}_mito_summary.txt
 
 printf "Done!! \n"
