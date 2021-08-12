@@ -140,6 +140,13 @@ if ! [[ -e "${W_URL}/log" ]]; then
 
 fi
 
+#create log folder
+if ! [[ -e "${ID}/qv" ]]; then
+
+        mkdir ${ID}/qv
+
+fi
+
 #create reference folder
 if ! [[ -e "${W_URL}/reference" ]]; then
 	
@@ -262,18 +269,19 @@ fi
 
 #trim the mitocontig
 printf "\nCommand: sh -e $mitoVGPdir/scripts/05_trimmer -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out\n"
-<<<<<<< HEAD
 sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; trimming with MitoFinder"
+	
 	cp $(ls -t ${W_URL}/trimmed/*fasta | head -n 1) ${ID}/${ID}_prelim_MTcontig.fasta
-	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID}
+	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_prelim_MTcontig.fasta $ID
+## add a qv check here to bring the mt back for another round of polishing if needed
+	
+	printf "\n\nStarting QV analaysis on completed assemblies"
+	sh $mitoVGPdir/submit_merqury.sh $ID
+	
+	exit 0;}
 
 ## add a qv check here to bring the mt back for another round of polishing if needed
-=======
-sh -e $mitoVGPdir/scripts/05_trimmer -i ${ID} -n ${CONTIG_ID} -t ${NPROC} ${SCRIPT5_OPTS} 2>&1 | tee ${W_URL}/log/${ID}_trimmer_$(date "+%Y%m%d-%H%M%S").out || { echo "trimming failed; try trimming with MitoFinder"
-	cp $(ls -t ${W_URL}/trimmed/*fasta | head -n 1) ${ID}/${ID}_trim1_prelim_MTcontig.fasta
-	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_trim1_prelim_MTcontig.fasta $ID
-	exit 0;}
->>>>>>> nextflow
+
 
 #polish the trimmed mitocontig with short reads
 printf "\nCommand: sh -e $mitoVGPdir/scripts/06_map10x2 -s ${SPECIES} -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 | tee ${W_URL}/log/${ID}_map10x2_$(date "+%Y%m%d-%H%M%S").out\n"
@@ -287,12 +295,17 @@ sh -e $mitoVGPdir/scripts/07_trimmer2 -i ${ID} -n ${CONTIG_ID} -t ${NPROC} 2>&1 
 	sh $mitoVGPdir/run_MitoFinder_annt.sh ${W_URL}/${ID}_trim2_prelim_MTcontig.fasta $ID 
 	exit 0;}
 
-
+cp ${W_URL}/trimmed2/${ID}.${CONTIG_ID}_polish2_10x1_trim1_10x2_trim2.fasta ${ID}_prelim_MTcontig.fasta
+cp ${W_URL}/trimmed2/${ID}.${CONTIG_ID}_polish2_10x1_trim1_10x2_trim2.fasta qv/
 printf "\n\nDone!"
 printf "\n\nCompleted mitocontig assembly at: $(date "+%Y-%m-%d %H-%M-%S")\n\n"
 
 printf "\n\nStarting mitofinder from trimmed 2x polished 2x mitocontig"
-	cp ${W_URL}/trimmed2/${ID}.${CONTIG_ID}_polish2_10x1_trim1_10x2_trim2.fasta ${ID}_prelim_MTcontig.fasta
-
 sh $mitoVGPdir/run_MitoFinder_annt.sh ${ID}_prelim_MTcontig.fasta $ID || \
- { printf "annotation with MitoFinder Failed"; exit 1; }
+{ printf "annotation with MitoFinder Failed"; exit 1; }
+cp ${ID}/${ID}_MitoFinder_mitfi_Final_Results/${ID}_mtDNA_contig.fasta qv/
+
+printf "\n\nStarting QV analaysis on completed assemblies"
+#cp ${ID}_prelim_MTcontig.fasta qv/${ID}_prelim_MTcontig.fasta
+sh $mitoVGPdir/submit_merqury.sh $ID
+

@@ -9,7 +9,7 @@ elif [ $1 == "-h" ]; then
 
         cat << EOF
 
-        Usage: '$0 <SPECIES> <JOBID>'
+        Usage: '$0 <SPECIES>'
 	Summarize the successful run oputputs of mito assmbly and annotation
 EOF
 
@@ -17,28 +17,30 @@ exit 0
 
 fi
 
-SPECIES=$1
-J=$2 # species or job id
+J=$1
+#J=$2 # species or job id
 
-MTDIR=/project/ag100pest/$SPECIES/MT_Contig ## hopefully a consistent directory structure will exist across projects
+printf "Summarize the successful run outputs of mito assmbly and annotation for $1 \n\n\n"
 
 ## what summary stats do we want from mitoVGP?
 ## read alignment rates
 ## number of canu contigs assembled
 printf "=== intermediate mito contigs assembled \n"
-grep '>' ${MTDIR}/${J}/assembly_MT_rockefeller/intermediates/canu/${J}.contigs.fasta
+grep '>' ${1}/assembly_MT_rockefeller/intermediates/canu/${J}.contigs.fasta
 ## lengths along the way
 
 ## mercury QV along the way
-printf "===  \n"
-#sbatch $MERQ/_submit_merqury.sh .meryl Pgos_mtDNA_contig.fasta all_k20
-
+printf "\n\n=== merqury qv along the way \n"
+printf "=======================================================\n"
+printf "fasta | uniq kmers in asm | kmers in both asm and reads | QV | Error rate\n"
+printf "=======================================================\n"
+cat qv/${1}_mt_gt100.qv
 
 ## mitofinder
-MF=$MTDIR/mitofinder/$J/${J}_MitoFinder_mitfi_Final_Results
+MF=mitofinder/$J/${J}_MitoFinder_mitfi_Final_Results
 [ ! -d "$MF" ] && echo "$MF does not exist" && exit 
 
-printf "MitoFinder Final Results in $MTDIR/mitofinder \n"
+printf "\n\n=== MitoFinder Final Results in mitofinder \n"
 cat $MF/${J}.infos 
 # inital contig name
 # final length
@@ -48,12 +50,14 @@ cat $MF/${J}.infos
 ## Are all tRNAs uniquely represented?
 
 TBL=$MF/${J}_mtDNA_contig.tbl
-printf "=== Parsing $MF/${JOBID}_mtDNA_contig.tbl \n"
-printf "=== unique PCG (out of 13):"
-grep 'product' Otur_mtDNA_contig.tbl | grep -v tRNA  | grep -v ribosomal | uniq | wc -l
-printf "=== unique tRNAs (out of 22):"
+printf "\n\n=== Parsing $MF/${J}_mtDNA_contig.tbl \n"
+printf "=== unique PCG (out of 13): "
+grep 'product' $TBL | grep -v tRNA  | grep -v ribosomal | uniq | wc -l
+printf "=== unique tRNAs (out of 22): " 
 grep 'tRNA' $TBL | uniq | grep -c 'product'
 printf "=== unique ribosomal RNA (out of 2): "
 grep 'ribosomal' $TBL | uniq  | wc -l
-printf "=== any notes\n"
+printf "=== any notes: \n"
 grep 'note' $TBL -B 2
+
+printf "\n\n=== Done! \n"

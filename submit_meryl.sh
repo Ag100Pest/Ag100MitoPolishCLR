@@ -23,6 +23,29 @@ mkdir -p qv
 cd qv
 pwd
 
-printf "out meryl db in ${PWD}/${1}.k31.meryl \n"
+printf "Species is $1 \n"
+printf "Species ID is  $2 \n"
+printf "out meryl db in ${PWD}/${2}.k31.meryl \n"
 
-sbatch $MERQ/_submit_build.sh 31 I_list.txt $1
+sbatch $MERQ/_submit_build.sh 31 I_list.txt $2
+
+wait_file() {
+  local file="$1"; shift
+
+  until [ -f $file ] ; do sleep 300; done
+  
+}
+
+wait_file ${1}.k31.hist
+
+
+## subset merqury db to kmers with at least 100x
+## this should have it's own process in nextflow because it takes a while
+meryl greater-than 100 ${2}.k31.meryl output ${2}.k31.gt100.meryl
+
+sh $MERQ/eval/qv.sh ${2}.k31.gt100.meryl ${2}_mtDNA_contig.fasta ${2}_mt_gt100
+
+cat ${SPECIES}_mt_gt100.qv
+
+
+

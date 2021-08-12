@@ -24,10 +24,8 @@ mitoVGP=/project/ag100pest/software/modified_mitoVGP
 
 #=== Main program
 SPECIES=$1
-WD=/project/ag100pest/$SPECIES/MT_Contig
 
 printf "Species ID  is $1 \n"
-printf "Output is $WD \n"
-cd $WD
+printf "Output is $PWD \n"
 
 sbatch $mitoVGP/run_merqury.sh $1

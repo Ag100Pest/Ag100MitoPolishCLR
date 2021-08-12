@@ -156,6 +156,7 @@ if ! [[ -e "${W_URL}/freebayes_round2/" ]]; then
 
 	printf "\n--Variant calling and polishing completed.\n"
 
+	cp ${W_URL}/freebayes_round2/${FNAME}_10x2.fasta ${ID}/assembly_MT_rockefeller/intermediates/polish4_contig.fasta
 else
 
 	printf "\n\noutput already present: skipping.\n\n"

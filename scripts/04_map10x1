@@ -313,6 +313,8 @@ if ! [[ -e "${W_URL}/freebayes_round1/${ID}.${CONTIG}_polish2_10x1.fasta" ]]; th
 	
 	bcftools consensus -Hla ${W_URL}/freebayes_round1/aligned_${ID}_all_sorted.bcf -f ${W_URL}/polish/polish_round2/${ID}.${CONTIG}_polish2.fasta -o ${W_URL}/freebayes_round1/${ID}.${CONTIG}_polish2_10x1.fasta
 
+	cp ${W_URL}/freebayes_round1/${ID}.${CONTIG}_polish2_10x1.fasta qv/
+
 	printf "\n--Variant calling and polishing completed.\n"
 
 fi

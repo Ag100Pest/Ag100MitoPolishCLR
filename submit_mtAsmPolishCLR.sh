@@ -31,6 +31,7 @@ printf "Species ID is  $2 \n"
 printf "Output is $WD \n"
 cd $WD
 
+### make some or statements here so that these things can be supplied explicitly as arguments too. 
 if [[ ! -f ref.fasta ]]; then
         printf "missing ref.fasta in working dir. Expects file named ref.fasta"
         exit 1
@@ -51,5 +52,5 @@ sbatch $mitoVGP/run_mitoVGP.sh $2
 
 ## make meryl db for qv
 mkdir -p $WD/qv
-ln -s $WD/I_list.txt $WD/qv
+ln -s $WD/I_list.txt $WD/qv/
 sh  $mitoVGP/submit_meryl.sh $2
