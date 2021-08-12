@@ -6,6 +6,7 @@ set -e -o pipefail
 #++++                        mitoVGP v2.2                         ++++
 #++++ The Vertebrate Genomes Project Mitogenome Assembly Pipeline ++++
 #++++     Credit: Giulio Formenti gformenti@rockefeller.edu       ++++
+#++++	Modified by Amanda Stahlke amanda.stahlke@usda.gov        ++++
 
 ##### mitoVGP dir for ag100pest added here
 mitoVGPdir=/project/ag100pest/software/modified_mitoVGP
@@ -41,11 +42,10 @@ elif [ $1 == "-h" ]; then
 	Optional arguments are:
 		-g the putative mitogenome size (potentially, that of the reference genome). If not provided, length of reference is used.
 		   It does not need to be precise. Accepts Canu formatting.
-		-d multithreaded download of files (true/false default: false) !! caution: true may require considerable amount of space.
-		-1 use pacbio/nanopore reads from list of files, requires absolute path (default looks into aws)
-		-2 use PE illumina reads from list of files (with fw and rv reads including R1/R2 in their names), requires absolute path (default looks into aws)
+		-1 use pacbio/nanopore reads from list of files, requires absolute path
+		-2 use PE illumina reads from list of files (with fw and rv reads including R1/R2 in their names), requires absolute path
 		-m the aligner (blasr|minimap2|pbmm2). Default is pbmm2
-		-f filter reads by size prior to assembly (reduces the number of NUMT reads and helps the assembly)
+		-f filter reads by size prior to assembly (reduces the number of NUMT reads and helps the assembly) default 20000 or 1.5*reference size, whichever is larger
 		-p filter reads by percent coverage of the reference over their length (avoid noise in the assembly when low coverage)
 		-o the options for Canu
 		-v picard validation stringency (STRICT/LENIENT default: STRICT)
@@ -117,8 +117,6 @@ while getopts ":a:i:r:g:t:1:2:m:f:o:n:v:p:z:b:" opt; do
 done
 
 printf "\n\n++++                 modified  mitoVGP v2.0                  ++++\n"
-printf "++++ The Vertebrate Genomes Project Mitogenome Assembly Pipeline ++++\n"
-printf "++++     Credit: Giulio Formenti gformenti@rockefeller.edu       ++++\n\n"
 
 printf "\nStarted at at: $(date "+%Y-%m-%d %H-%M-%S")\n"
 printf "\nWith command:\n"
@@ -140,7 +138,7 @@ if ! [[ -e "${W_URL}/log" ]]; then
 
 fi
 
-#create log folder
+#create qv folder
 if ! [[ -e "${ID}/qv" ]]; then
 
         mkdir ${ID}/qv
@@ -168,7 +166,13 @@ if [[ -z  ${GSIZE} ]]; then
 	printf "\nGenome size not provided, using reference genome size: ${GSIZE} bp\n"
 
 	if [[ -z  ${FL} ]]; then
-	FL=$(python -c "print(round(1.5*$GSIZE))")
+	DEF_FL=20000 # filter reads longer than this default
+	AUTO_FL=$(python -c "print(round(1.5*$GSIZE))") # unless 1.5*reference size is larger
+		if ["$DEF_FL" -gt "$AUTO_FL"];then
+			FL=$DEF_FL
+		else
+			FL=$AUTO_FL
+		fi
 	printf "\nWill filter reads longer than $FL \n"
 	fi
 fi

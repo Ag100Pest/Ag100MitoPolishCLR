@@ -24,17 +24,15 @@ mitoVGP=/project/ag100pest/software/modified_mitoVGP
 
 #=== Main program
 SPECIES=$1
-WD=/project/ag100pest/$SPECIES/MT_Contig
 
-printf "Species is $1 \n"
-printf "Species ID is  $2 \n"
-printf "Output is $WD \n"
-cd $WD
+printf "Species ID is  $1 \n"
+printf "Output is $PWD/$1 \n" 
 
 ### make some or statements here so that these things can be supplied explicitly as arguments too. 
 if [[ ! -f ref.fasta ]]; then
-        printf "missing ref.fasta in working dir. Expects file named ref.fasta"
-        exit 1
+        printf "missing ref.fasta in working dir. Expects file named ref.fasta\n"
+        printf "Use get_ref.sh with NCBI accession ID to get ref.fasta and ref.gb\n"
+	exit 1
 fi
 
 if [[ ! -f PB_list.txt ]]; then
@@ -48,9 +46,9 @@ if [[ ! -f I_list.txt ]]; then
 fi
 
 
-sbatch $mitoVGP/run_mitoVGP.sh $2
+sbatch $mitoVGP/run_mitoVGP.sh $1
 
 ## make meryl db for qv
-mkdir -p $WD/qv
-ln -s $WD/I_list.txt $WD/qv/
-sh  $mitoVGP/submit_meryl.sh $2
+mkdir -p qv
+ln -sf I_list.txt qv/
+sbatch  $mitoVGP/submit_meryl.sh $1

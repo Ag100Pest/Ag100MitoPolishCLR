@@ -21,13 +21,6 @@ if [[ ! -d ${1}.k31.meryl ]]; then
         exit 1
 fi
 
-## subset whole genome merqury db to kmers with at least 100x
-## this should have it's own process in nextflow because it takes a while
-printf "subsetting whole genome meryl db \n"
-meryl greater-than 100 ${1}.k31.meryl output ${1}.k31.gt100.meryl
-
-
-rm ${1}_mt_gt100.qv
 printf "Will evaluate qv on $(ls ${1}*.fasta) \n"
 
 for f in ${1}*.fasta; do

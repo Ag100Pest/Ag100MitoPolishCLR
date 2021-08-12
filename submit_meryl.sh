@@ -1,4 +1,11 @@
 #! /usr/bin/env bash
+#SBATCH -p short
+#SBATCH --job-name=meryldb_mito        #<= name your job
+#SBATCH --output=R-%x.%J.out          # standard out goes to R-JOBNAME.12345.out
+#SBATCH --error=R-%x.%J.err           # standard error goes to R-JOBBNAME.12345.err
+#SBATCH --mail-user=amandastahlke@gmail.com    #<= Your email
+#SBATCH --mail-type=begin
+#SBATCH --mail-type=end
 
 module load merqury/1.1
 module load meryl/1.0
@@ -24,10 +31,9 @@ cd qv
 pwd
 
 printf "Species is $1 \n"
-printf "Species ID is  $2 \n"
-printf "out meryl db in ${PWD}/${2}.k31.meryl \n"
+printf "out meryl db in ${PWD}/${1}.k31.meryl \n"
 
-sbatch $MERQ/_submit_build.sh 31 I_list.txt $2
+sbatch $MERQ/_submit_build.sh 31 I_list.txt $1
 
 wait_file() {
   local file="$1"; shift
@@ -41,11 +47,5 @@ wait_file ${1}.k31.hist
 
 ## subset merqury db to kmers with at least 100x
 ## this should have it's own process in nextflow because it takes a while
-meryl greater-than 100 ${2}.k31.meryl output ${2}.k31.gt100.meryl
-
-sh $MERQ/eval/qv.sh ${2}.k31.gt100.meryl ${2}_mtDNA_contig.fasta ${2}_mt_gt100
-
-cat ${SPECIES}_mt_gt100.qv
-
-
+meryl greater-than 100 ${1}.k31.meryl output ${1}.k31.gt100.meryl
 
