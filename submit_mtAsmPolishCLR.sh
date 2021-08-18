@@ -1,20 +1,10 @@
 #! /usr/bin/env bash
 
-if [ -z $1 ]; then
+if [ -z $1 ] || [ "$1" = "-h" ]; then
 
-        printf "Usage: '$0 <SPECIES> <JOBID> <REF_MT> <PACBIO_LIST> <I_LIST>'
+        printf "Usage: '$0 <JOB_ID>'
         Submits the modified mitoVGP pipeline to assemble mitochondrial genomes from pacbio CRL and illumina polishing data"
         exit 0
-
-elif [ $1 == "-h" ]; then
-
-        cat << EOF
-
-        Usage: '$0 <SPECIES> <JOBID> <REF_MT> <PACBIO_LIST> <I_LIST>'
-        Runs the modified mitoVGP pipeline to assemble mitochondrial genomes from pacbio CRL and illumina polishing data
-EOF
-
-exit 0
 
 fi
 
@@ -34,7 +24,7 @@ if [[ ! -f ref.fasta ]]; then
         printf "Use get_ref.sh with NCBI accession ID to get ref.fasta and ref.gb\n"
 	exit 1
 fi
-
+ 
 if [[ ! -f PB_list.txt ]]; then
         printf "missing PB_list.txt in working dir. Expects file named PB_list.txt"
         exit 1
@@ -50,5 +40,5 @@ sbatch $mitoVGP/run_mitoVGP.sh $1
 
 ## make meryl db for qv
 mkdir -p qv
-ln -sf I_list.txt qv/
+cp I_list.txt qv/
 sbatch  $mitoVGP/submit_meryl.sh $1

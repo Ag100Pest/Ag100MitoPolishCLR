@@ -26,6 +26,20 @@ Allio, R., Schomaker-Bastos, A., Romiguier, J., Prosdocimi, F., Nabholz, B., & D
   * `<reference>.fasta`: Mitochnodrial genome of a closely related species. In this case, Sitotroga cerealella mitochondrion, complete genome
   * `<reference>.gb`: Mitochnodrial genbank of a closely related species. In this case, Sitotroga cerealella mitochondrion, complete genome
 
+**Mercury and Meryl**
+
+## Basic Usage
+Export software directory to your path. Add this to .bashrc to 
+`export PATH="/project/ag100pest/software/modified_mitoVGP/:$PATH"`
+
+Download reference.fasta and refererence.gb from a closely related species. 
+`get_ref.sh <MT ACCESSION ID>`
+
+Prepare expected inputs I_list.txt for Illumina Polishing and PB_list.txt with subreads.bam. Eg `ls /project/ag100pest/Illumina_polishing/JAMU*{R1,R2}.fastq.bz2 > I_list.txt`
+
+submit_
+
+
 ### Reference mt genomes
 Reads are assembled if they align against the reference mitogenome, so best to have a complete assembly.  
 Find closely related mitogenomes at https://goat.genomehubs.org/ 
@@ -36,23 +50,20 @@ Pull fasta or gb with EDirect suite from NCBI
 
 We use the mitoVGP approach to assemble, polish, and do preliminary trimming. Submit with `sbatch submit_MTAsmPolishCLR.slurm` which contains the shell script `run_mitoVGP.sh`. Currently this is hard-coded with species and parameters.
 
-  1. `$mitoVGPdir/scripts/mtDNApipe`
+  1. `$mitoVGPdir/scripts/01_mtDNApipe`
     1. identifies MT-like reads by aligning long reads to reference sequence
     2. assembles contigs with canu/1.8
-  2. `$mitoVGPdir/scripts/blastMT` identifies the best assembled mitocontig with blast
-  3. `$mitoVGPdir/scripts/mitoPolish` polishes mitocontig with two rounds of Arrow using the same reads used by Canu
-  4. `$mitoVGPdir/scripts/map10x1` polishes mitocontig with short reads by aligning to the mitocontig. A final round of freebayes and bcftools consensus is required to obtain the polished contig using the aligned outcome of the script (this step is currently not included in the script).
-  5. Trimming. *This seems to be the crux.*
-
-    * `$mitoVGPdir/scripts/trimmer` generates a trimmed version of the Canu mitocontig after short read polishing (map10x1). The resulting contig has 100 bp overlapping ends on both sides.
+  2. `$mitoVGPdir/scripts/02_blastMT` identifies the best assembled mitocontig with blast
+  3. `$mitoVGPdir/scripts/03_mitoPolish` polishes mitocontig with two rounds of Arrow using the same reads used by Canu
+  4. `$mitoVGPdir/scripts/04_map10x1` polishes mitocontig with short reads by aligning to the mitocontig
+  5. Trimming.
+    * `$mitoVGPdir/scripts/05_trimmer` generates a trimmed version of the Canu mitocontig after short read polishing (map10x1). The resulting contig has 100 bp overlapping ends on both sides.
 	* If you need to span a long repetitive region, increase the mummer sensitivity `-z 500` to `-z 5000` (or more?)
-	* If the overlapping sequences at both ends of the contig are perfectly identical, then show-coords doesn't print BEGIN and END. The grep fails and kicks out an error message, "trimming failed; try trimming with MitoFinder"
-	* If trimmer fails, use the circularization approach of mitofinder, which uses blast self-alignment to identify overlap instead.
-
-  6. Another round of polishing to clean up trimmed ends? This is not implemented yet. Skip if qv doesn't find "false kmers". 
+	* If the overlapping sequences at both ends of the contig are perfectly identical, then show-coords doesn't print BEGIN and END. The grep fails and kicks out an error message, "trimming failed; trimming with MitoFinder". Then we use the circularization approach of mitofinder, which uses a blast self-alignment to identify overlap instead.
+  6. Another round of polishing to clean up trimmed ends.  This is not implemented yet. Skip if qv doesn't find "false kmers". 
 
 ## Annotation
- 7. MitoFinder. Annotations are found in `<job_name>`_MitoFinder_mitfi_Final_Results
+ MitoFinder. Annotations are found in `<job_name>`_MitoFinder_mitfi_Final_Results
 
 ## Report summary
  What all do we want here?

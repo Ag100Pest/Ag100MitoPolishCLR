@@ -138,13 +138,6 @@ if ! [[ -e "${W_URL}/log" ]]; then
 
 fi
 
-#create qv folder
-if ! [[ -e "${ID}/qv" ]]; then
-
-        mkdir ${ID}/qv
-
-fi
-
 #create reference folder
 if ! [[ -e "${W_URL}/reference" ]]; then
 	
@@ -166,7 +159,7 @@ if [[ -z  ${GSIZE} ]]; then
 	printf "\nGenome size not provided, using reference genome size: ${GSIZE} bp\n"
 
 	if [[ -z  ${FL} ]]; then
-	DEF_FL=20000 # filter reads longer than this default
+	declare -i DEF_FL=20000  # filter reads longer than this default
 	AUTO_FL=$(python -c "print(round(1.5*$GSIZE))") # unless 1.5*reference size is larger
 		if ["$DEF_FL" -gt "$AUTO_FL"];then
 			FL=$DEF_FL
@@ -316,7 +309,7 @@ wait_file() {
   
 }
 
-wait_file ${ID}_mt_gt100.qv
+wait_file qv/${ID}_mt_gt100.qv
 
 sh $mitoVGPdir/summary.sh $ID > ${ID}_mito_summary_$(date "+%Y%m%d-%H%M%S").txt
 
