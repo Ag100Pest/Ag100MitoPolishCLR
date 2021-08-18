@@ -16,7 +16,7 @@ MERQ=/project/ag100pest/software/merqury
 printf "Species is $1 \n"
 printf "Working directory is $PWD \n"
 
-if [[ ! -d ${1}.k31.meryl ]]; then
+if [[ ! -d ${1}.k31.gt100.meryl ]]; then
         printf "missing meryl db in working dir.Build meryl db with submit_meryl.sh"
         exit 1
 fi

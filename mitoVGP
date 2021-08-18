@@ -116,6 +116,14 @@ while getopts ":a:i:r:g:t:1:2:m:f:o:n:v:p:z:b:" opt; do
 
 done
 
+### functions ###
+wait_file() {
+  local file="$1"; shift
+
+  until [ -f $file ] ; do sleep 300; printf "still waiting on $file"; done
+
+}
+
 printf "\n\n++++                 modified  mitoVGP v2.0                  ++++\n"
 
 printf "\nStarted at at: $(date "+%Y-%m-%d %H-%M-%S")\n"
@@ -298,19 +306,17 @@ sh $mitoVGPdir/run_MitoFinder_annt.sh ${ID}_prelim_MTcontig.fasta $ID || \
 { printf "annotation with MitoFinder Failed"; exit 1; }
 cp ${ID}/${ID}_MitoFinder_mitfi_Final_Results/${ID}_mtDNA_contig.fasta qv/
 
+printf "Waiting for nuclear meryl db results \n"
+wait_file qv/${ID}.k31.gt100.meryl
+
 printf "\n\nStarting QV analaysis on completed assemblies"
 #cp ${ID}_prelim_MTcontig.fasta qv/${ID}_prelim_MTcontig.fasta
 sh $mitoVGPdir/submit_merqury.sh $ID
 
-wait_file() {
-  local file="$1"; shift
-
-  until [ -f $file ] ; do sleep 300; done
-  
-}
-
+printf "Waiting for merqury results \n"
 wait_file qv/${ID}_mt_gt100.qv
 
 sh $mitoVGPdir/summary.sh $ID > ${ID}_mito_summary_$(date "+%Y%m%d-%H%M%S").txt
+ln -s $ID/${ID}_MitoFinder_mitfi_Final_Results/${ID}_mtDNA_contig.fasta ${ID}_mtDNA_contig.fasta
 
 printf "Done!! \n"
