@@ -53,16 +53,13 @@ We use the mitoVGP approach to assemble, polish, and do preliminary trimming. Su
   2. `$mitoVGPdir/scripts/02_blastMT` identifies the best assembled mitocontig with blast
   3. `$mitoVGPdir/scripts/03_mitoPolish` polishes mitocontig with two rounds of Arrow using the same reads used by Canu
   4. `$mitoVGPdir/scripts/04_map10x1` polishes mitocontig with short reads by aligning to the mitocontig
-  5. Trimming.
-    * `$mitoVGPdir/scripts/05_trimmer` generates a trimmed version of the Canu mitocontig after short read polishing (map10x1). The resulting contig has 100 bp overlapping ends on both sides.
-	* If you need to span a long repetitive region, increase the mummer sensitivity `-z 500` to `-z 5000` (or more?)
-	* If the overlapping sequences at both ends of the contig are perfectly identical, then show-coords doesn't print BEGIN and END. The grep fails and kicks out an error message, "trimming failed; trimming with MitoFinder". Then we use the circularization approach of mitofinder, which uses a blast self-alignment to identify overlap instead.
+  5. `$mitoVGPdir/scripts/05_trimmer` generates a trimmed version of the Canu mitocontig after short read polishing (map10x1). The resulting contig has 100 bp overlapping ends on both sides.
+* If you need to span a long repetitive region, increase the mummer sensitivity `-z 500` to `-z 5000` (or more?)
+* If the overlapping sequences at both ends of the contig are perfectly identical, then show-coords doesn't print BEGIN and END. The grep fails and kicks out an error message, "trimming failed; trimming with MitoFinder". Then we use the circularization approach of mitofinder, which uses a blast self-alignment to identify overlap instead.
   6. Another round of polishing to clean up trimmed ends.  This is not implemented yet. Skip if qv doesn't find "false kmers". 
 
 ## Annotation
  MitoFinder. Annotations are found in `<job_name>`_MitoFinder_mitfi_Final_Results
 
 ## Report summary
- What all do we want here?
-* qv checks implemented with mercury and meryl - still need to finish cleaning this up
-* summary.sh prints results from mitofinder
+summary.sh prints results from mitofinder
