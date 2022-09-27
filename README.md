@@ -1,3 +1,8 @@
+
+
+[![DOI](https://zenodo.org/badge/386773752.svg)](https://zenodo.org/badge/latestdoi/386773752)
+
+
 # Ag100pest CLR+Illumina  mt genome pipeline
 
 This approach builds upon the mitoVGP pipeline (https://github.com/gf777/mitoVGP) to assemble, polish, circularize, qv check, and annotate Ag100Pest mt genomes frm CLR + Illumina data.
